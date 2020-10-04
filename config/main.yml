@@ -1,0 +1,11 @@
+product_name: Snap
+version: 0.1.0
+
+layout:
+    logger_config: config/logger.json
+    preferences_path: config/preferences.json
+    systray_icon: media/icons/workstation-256-blue.png
+    database_path: ~/.wmanager/database
+
+format:
+    timestamp: "%Y-%m-%d_%H-%M-%S"

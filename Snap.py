@@ -24,6 +24,7 @@ def init():
         helpers.setup_logger(
             logger_config_path=helpers.join_path(main_config["config_dir"], 'logger.json'),
             timestamp = main_config["timestamp"])
+        global logger
         logger = logging.getLogger(__name__)
         logger.info('Logger is up!')
     except:
@@ -50,7 +51,7 @@ if __name__ == "__main__":
         print('done')
 
         # invoke main program
-        # logger.info('Starting application')
+        logger.info('Starting application')
         # preferences_path = main_config['layout']['preferences_path']
         # snap.main.run(main_config, preferences_path)
         # pass

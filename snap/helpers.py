@@ -60,9 +60,11 @@ def setup_logger(
     logging.config.dictConfig(logger_config)
 
 def load_config_yml(config_file_path):
+    logger.debug(f'reading YAML file "{config_file_path}"')
     yaml = YAML(typ='safe')
     with open(config_file_path, "rt") as file:
         config = yaml.load(file)
+    logger.debug(f'YAML config: "{config}"')
     return config
 
 def errpopup(exception):

@@ -8,10 +8,10 @@ autopep8 = "*"
 pylint = "*"
 
 [packages]
-ruamel-yaml = "*"
 pyinstaller = "*"
 pypiwin32 = "*"
 pyside2 = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.7"

@@ -13,6 +13,10 @@ misc/
 *_.py
 *test*.py
 
+#(ps)(!) TEMPORARY
+*.png
+*.ico
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

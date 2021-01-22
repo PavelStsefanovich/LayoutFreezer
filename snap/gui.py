@@ -23,13 +23,6 @@ if current_os == 'windows':
     from .os_screen import windows as osscreen
 
 
-
-##########  Classes  ##############################
-
-#class
-
-
-
 ##########  Functions  ############################
 
 def show_critical_error_dialog(

@@ -6,7 +6,7 @@ import re
 import sys
 import yaml
 from datetime import datetime
-from .ui import show_critical_error_dialog
+from .gui import show_critical_error_dialog
 
 
 

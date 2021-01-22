@@ -6,6 +6,3 @@ logger_config: "{root_dir}/logger.json"
 #preferences_path: config/preferences.json
 systray_icon: "{root_dir}/snap.png"
 database_path: "~/.snap/database"
-
-inner:
-  some_path: "{root_dir}/{root_dir}/{something_else}/da"

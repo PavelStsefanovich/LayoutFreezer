@@ -1,0 +1,11 @@
+product_name: Snap
+version: 0.2.0
+
+timestamp_format: "%Y-%m-%d_%H-%M-%S"
+logger_config: "{root_dir}/logger.json"
+#preferences_path: config/preferences.json
+systray_icon: "{root_dir}/snap.png"
+database_path: "~/.snap/database"
+
+inner:
+  some_path: "{root_dir}/{root_dir}/{something_else}/da"

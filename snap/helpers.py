@@ -4,9 +4,9 @@ import logging.config
 import os
 import re
 import sys
-
+import yaml
 from datetime import datetime
-from ruamel.yaml import YAML
+from .ui import show_critical_error_dialog
 
 
 
@@ -24,12 +24,13 @@ def get_root_dir():
     elif __file__:
         return os.path.realpath(sys.path[0])
 
-def join_path(parent, child):
-    return os.path.realpath(os.path.join(parent, child))
 
 def setup_logger(
         logger_config_path="logger.json",
-        timestamp=datetime.now().strftime("%Y-%m-%d_%H-%M-%S")):
+        start_time=datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+        timestamp_format="%Y-%m-%d_%H-%M-%S"):
+
+    timestamp = start_time.strftime(timestamp_format)
 
     # load logger config
     logger_config_path = os.path.abspath(logger_config_path)
@@ -59,17 +60,42 @@ def setup_logger(
     # apply logger config
     logging.config.dictConfig(logger_config)
 
-def load_config_yml(config_file_path):
-    logger.debug(f'reading YAML file "{config_file_path}"')
-    yaml = YAML(typ='safe')
+
+def load_config_yml(config_file_path, log=True):
+    if log:
+        logger.debug(f'reading YAML file "{config_file_path}"')
     with open(config_file_path, "rt") as file:
-        config = yaml.load(file)
-    logger.debug(f'YAML config: "{config}"')
+        config = yaml.safe_load(file)
+    if log:
+        logger.debug(f'YAML config: "{config}"')
     return config
 
-def errpopup(exception):
-    pass
 
+def errpopup(errormessage=None, level=None):
+    if level == 'critical':
+        show_critical_error_dialog(errormessage=errormessage)
+
+
+def dict_replace_placeholders(dic1=None, dic2=None):
+    if not dic1:
+        return dic1
+    if not dic2:
+        dic2 = dic1.copy()
+    dic = dic1.copy()
+    for el in dic1:
+        if isinstance(dic1[el], dict):
+            dic[el] = dict_replace_placeholders(dic[el], dic)
+            continue
+        if isinstance(dic1[el], str):
+            el_placeholders = re.findall('\{\w+\}', dic[el])
+            for placeholder in el_placeholders:
+                placeholder_value = dic2.get(placeholder.strip('{}'))
+                if placeholder_value:
+                    if isinstance(placeholder_value, str):
+                        dic[el] = dic[el].replace(
+                            placeholder, placeholder_value)
+
+    return dic
 
 
 ##########  Main  #################################

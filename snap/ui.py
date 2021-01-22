@@ -3,7 +3,8 @@ import logging
 import sys
 
 from .db import Database
-from PySide2 import QtWidgets, QtGui
+from PySide2 import QtGui
+from PySide2 import QtWidgets
 from os import path, makedirs
 
 
@@ -23,7 +24,23 @@ if current_os == 'windows':
 
 
 
+##########  Classes  ##############################
+
+#class
+
+
+
 ##########  Functions  ############################
+
+def show_critical_error_dialog(
+    errormessage="Critical error occured (no details provided)"):
+
+    app = QtWidgets.QApplication(sys.argv)
+    msgBox = QtWidgets.QMessageBox()
+    msgBox.setIcon(QtWidgets.QMessageBox.Critical)
+    msgBox.setText(errormessage)
+    msgBox.show()
+    sys.exit(app.exec_())
 
 # def scr_get_display_index(screens, win_rectangle):
 

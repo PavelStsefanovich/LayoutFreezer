@@ -8,7 +8,6 @@ from PySide2 import QtWidgets
 from os import path, makedirs
 
 
-
 ##########  Module Properties  ####################
 
 logger = logging.getLogger(__name__)
@@ -153,8 +152,8 @@ def load_preferences_from_file(preferences_path):
 ##########  Classes  ##############################
 
 class SystemTrayApp():
-    def __init__(self, iconpath, tooltip='SystemTrayApp', database_path='database', preferences_path='preferences.json'):
 
+    def __init__(self, iconpath, tooltip='SystemTrayApp', database_path='database', preferences_path='preferences.json'):
         # Initiate database connection
         database_path = database_path.replace('~',path.expanduser('~'))
         database_path = path.abspath(database_path)

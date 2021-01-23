@@ -2,7 +2,7 @@ import logging
 import sys
 from datetime import datetime
 from os import path
-from snap import helpers
+from layoutfreezer import helpers, app
 
 
 ##########  Global Properties  ####################
@@ -19,7 +19,7 @@ def init():
     global main_config
     main_config_filepath = path.realpath(
         path.join(main_config["root_dir"], "config.yml"))
-    errormessage = f'Snap failed to start.\n'
+    errormessage = f'LayoutFreezer failed to start.\n'
 
     try:
         main_config.update(
@@ -70,11 +70,11 @@ if __name__ == "__main__":
         # invoke main program
         logger.info('Starting application')
         # preferences_path = main_config['layout']['preferences_path']
-        # snap.main.run(main_config, preferences_path)
+        app.run(main_config)
         # pass
     except Exception as e:
         try:
-            #snap.helpers.errpopup(e)
+            #layoutfreezer.helpers.errpopup(e)
             print(f'(!){e}')
             logger.exception(e)
         except:

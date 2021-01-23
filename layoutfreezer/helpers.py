@@ -9,11 +9,9 @@ from datetime import datetime
 from .gui import show_critical_error_dialog
 
 
-
-##########  Module Properties  ####################
+##########  Global Properties  ####################
 
 logger = logging.getLogger(__name__)
-
 
 
 ##########  Functions  ############################
@@ -67,7 +65,7 @@ def load_config_yml(config_file_path, log=True):
     with open(config_file_path, "rt") as file:
         config = yaml.safe_load(file)
     if log:
-        logger.debug(f'YAML config: "{config}"')
+        logger.debug(f'loaded YAML config: "{config}"')
     return config
 
 

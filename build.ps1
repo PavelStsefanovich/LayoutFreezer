@@ -6,7 +6,7 @@ cd $PSScriptRoot
 try {
     gi dist -ErrorAction SilentlyContinue | rm -Force -recurse
     & pipenv install
-    & pipenv run pyinstaller -F -i snap.ico -n BookScraper main.py
+    & pipenv run pyinstaller -F -i layoutfreezer.ico -n LayoutFreezer main.py
     # cp params.yml dist
     # cp config dist -recurse
     # rm dist/config/*.ico    

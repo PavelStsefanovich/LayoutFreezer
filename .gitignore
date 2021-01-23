@@ -14,8 +14,7 @@ misc/
 *test*.py
 
 #(ps)(!) TEMPORARY
-*.png
-*.ico
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

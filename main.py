@@ -52,31 +52,19 @@ def init():
         sys.exit()
 
 
-##########  Main  #################################
-
-if __name__ == "__main__":
-
-    # run init
-    init()
-
-    # invoke main program
+def run():
+    global main_config
     try:
-        
-        
-        #TODO remove: 
-        print(main_config)
-        print('done')
-
-        # invoke main program
         logger.info('Starting application')
         # preferences_path = main_config['layout']['preferences_path']
         app.run(main_config)
-        # pass
     except Exception as e:
-        try:
-            #layoutfreezer.helpers.errpopup(e)
-            print(f'(!){e}')
-            logger.exception(e)
-        except:
-            pass
-        raise e
+        logger.error('FATAL EXCEPTION OCCURRED:')
+        logger.error(e)
+
+
+##########  Main  #################################
+
+if __name__ == "__main__":
+    init()
+    run()

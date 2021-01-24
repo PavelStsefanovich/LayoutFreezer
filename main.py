@@ -1,8 +1,8 @@
-import logging
-import sys
 from datetime import datetime
-from os import path
 from layoutfreezer import helpers, app
+import logging
+from os import path
+import sys
 
 
 ##########  Global Properties  ####################
@@ -60,6 +60,7 @@ def run():
     except Exception as e:
         logger.error('FATAL EXCEPTION OCCURRED:')
         logger.error(e)
+        raise
 
 
 ##########  Main  #################################

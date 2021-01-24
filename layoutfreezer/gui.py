@@ -1,11 +1,10 @@
+from .db import Database
 import json
 import logging
-import sys
-
-from .db import Database
 from PySide2 import QtGui
 from PySide2 import QtWidgets
 from os import path, makedirs
+import sys
 
 
 ##########  Module Properties  ####################
@@ -15,11 +14,11 @@ logger = logging.getLogger(__name__)
 # Determine Operating System
 #(ps) currently windows only
 #current_os = get_os()
-current_os = 'windows'
+# current_os = 'windows'
 
 # load os-specific module for screen/windows operations
-if current_os == 'windows':
-    from .os_screen import windows as osscreen
+# if current_os == 'windows':
+#     from .os_screen import windows as osscreen
 
 
 ##########  Functions  ############################
@@ -68,77 +67,77 @@ def show_critical_error_dialog(
 #     return occurencies
 
 
-def db_enum_apps_for_curr_layout(db, dl_hash, simplify=True):
-    layout_app_configs = db.search(dl_hash=dl_hash, order_by='process_name')
+# def db_enum_apps_for_curr_layout(db, dl_hash, simplify=True):
+#     layout_app_configs = db.search(dl_hash=dl_hash, order_by='process_name')
 
-    if simplify:
-        results = []
-        for item in layout_app_configs:
-            results.append(item[2:-1])
+#     if simplify:
+#         results = []
+#         for item in layout_app_configs:
+#             results.append(item[2:-1])
 
-    else:
-        results = layout_app_configs
+#     else:
+#         results = layout_app_configs
 
-    if results:
-        logger.debug(f'Found app configurations in database for layout {dl_hash}')
-        logger.debug(f'app_configs: {results}')
+#     if results:
+#         logger.debug(f'Found app configurations in database for layout {dl_hash}')
+#         logger.debug(f'app_configs: {results}')
 
-    else:
-        logger.debug(f'No app configurations found in database for layout {dl_hash}')
+#     else:
+#         logger.debug(f'No app configurations found in database for layout {dl_hash}')
 
-    return results
-
-
-def db_add_app_config(db, display_layout_hash, window_config):
-    process_name = window_config[0]
-    title = window_config[1]
-    rect = str(window_config[2])
-    display_index = window_config[3]
-    display_orientation = window_config[4]
-
-    logger.debug(f'Adding:')
-    logger.debug(f' - process_name: {process_name}')
-    logger.debug(f' - window_title: {title}')
-    logger.debug(f' - window_rectangle: {rect}')
-    logger.debug(f' - display_index: {display_index}')
-    logger.debug(f' - display_orientation: {display_orientation}')
-
-    db.add( display_layout_hash,
-            process_name,
-            title,
-            rect,
-            display_index,
-            display_orientation)
+#     return results
 
 
-def simplify_app_config(app_config):
-    result = (app_config['process_name'],
-              app_config['window_title'],
-              str(app_config['window_rectangle']),
-              app_config['display_index'],
-              app_config['display_orientation'])
+# def db_add_app_config(db, display_layout_hash, window_config):
+#     process_name = window_config[0]
+#     title = window_config[1]
+#     rect = str(window_config[2])
+#     display_index = window_config[3]
+#     display_orientation = window_config[4]
 
-    return result
+#     logger.debug(f'Adding:')
+#     logger.debug(f' - process_name: {process_name}')
+#     logger.debug(f' - window_title: {title}')
+#     logger.debug(f' - window_rectangle: {rect}')
+#     logger.debug(f' - display_index: {display_index}')
+#     logger.debug(f' - display_orientation: {display_orientation}')
+
+#     db.add( display_layout_hash,
+#             process_name,
+#             title,
+#             rect,
+#             display_index,
+#             display_orientation)
+
+
+# def simplify_app_config(app_config):
+#     result = (app_config['process_name'],
+#               app_config['window_title'],
+#               str(app_config['window_rectangle']),
+#               app_config['display_index'],
+#               app_config['display_orientation'])
+
+#     return result
     
 
-def extract_process_names(layout_app_configs):
-    apps = []
+# def extract_process_names(layout_app_configs):
+#     apps = []
 
-    for app_config in layout_app_configs:
-        apps.append(app_config[0])
+#     for app_config in layout_app_configs:
+#         apps.append(app_config[0])
 
-    return apps
+#     return apps
 
 
-def load_preferences_from_file(preferences_path):
-    prefs = {}
+# def load_preferences_from_file(preferences_path):
+#     prefs = {}
     
-    if path.exists(preferences_path):
-        with open(preferences_path, 'r') as file:
-            prefs = json.load(file)
+#     if path.exists(preferences_path):
+#         with open(preferences_path, 'r') as file:
+#             prefs = json.load(file)
 
     
-    return prefs
+#     return prefs
 
 
 # def db_update_app_config(db, display_layout, window_config):
@@ -151,109 +150,109 @@ def load_preferences_from_file(preferences_path):
 
 ##########  Classes  ##############################
 
-class SystemTrayApp():
+# class SystemTrayApp():
 
-    def __init__(self, iconpath, tooltip='SystemTrayApp', database_path='database', preferences_path='preferences.json'):
-        # Initiate database connection
-        database_path = database_path.replace('~',path.expanduser('~'))
-        database_path = path.abspath(database_path)
-        logger.debug(f'Database path: {database_path}')
-        makedirs(path.split(database_path)[0], exist_ok=True)
-        self.db = Database(database_path)
+#     def __init__(self, iconpath, tooltip='SystemTrayApp', database_path='database', preferences_path='preferences.json'):
+#         # Initiate database connection
+#         database_path = database_path.replace('~',path.expanduser('~'))
+#         database_path = path.abspath(database_path)
+#         logger.debug(f'Database path: {database_path}')
+#         makedirs(path.split(database_path)[0], exist_ok=True)
+#         self.db = Database(database_path)
 
-        # Set preferences file path
-        self.preferences_path = path.abspath(preferences_path)
+#         # Set preferences file path
+#         self.preferences_path = path.abspath(preferences_path)
 
-        # Init QApplication, QWidet and QMenu
-        self.app = QtWidgets.QApplication([])
-        self.widget = QtWidgets.QWidget()
-        self.menu = QtWidgets.QMenu(self.widget)
+#         # Init QApplication, QWidet and QMenu
+#         self.app = QtWidgets.QApplication([])
+#         self.widget = QtWidgets.QWidget()
+#         self.menu = QtWidgets.QMenu(self.widget)
 
-        # Add items to menu
-        self.menu_action_raise = self.menu.addAction("Restore Layout")
-        self.menu_action_raise.triggered.connect(self.restore_layout)
+#         # Add items to menu
+#         self.menu_action_raise = self.menu.addAction("Restore Layout")
+#         self.menu_action_raise.triggered.connect(self.restore_layout)
 
-        self.menu_action_raise = self.menu.addAction("Freeze Layout")
-        self.menu_action_raise.triggered.connect(self.freeze_layout)
+#         self.menu_action_raise = self.menu.addAction("Freeze Layout")
+#         self.menu_action_raise.triggered.connect(self.freeze_layout)
 
-        self.menu_action_raise = self.menu.addSeparator()
+#         self.menu_action_raise = self.menu.addSeparator()
 
-        self.menu_action_raise = self.menu.addAction("Preferences")
-        self.menu_action_raise.triggered.connect(self.open_preferences)
+#         self.menu_action_raise = self.menu.addAction("Preferences")
+#         self.menu_action_raise.triggered.connect(self.open_preferences)
 
-        self.menu_action_raise = self.menu.addSeparator()
+#         self.menu_action_raise = self.menu.addSeparator()
 
-        self.menu_action_exit = self.menu.addAction("Exit")
-        self.menu_action_exit.triggered.connect(self.app.exit)
+#         self.menu_action_exit = self.menu.addAction("Exit")
+#         self.menu_action_exit.triggered.connect(self.app.exit)
 
-        # Create app icon
-        iconpath = path.abspath(iconpath)
-        logger.debug(f'SystemTray icon path: {iconpath}')
-        self.icon = QtGui.QIcon(iconpath)
+#         # Create app icon
+#         iconpath = path.abspath(iconpath)
+#         logger.debug(f'SystemTray icon path: {iconpath}')
+#         self.icon = QtGui.QIcon(iconpath)
 
-        # Create the tray app
-        self.tray = QtWidgets.QSystemTrayIcon(self.icon, self.widget)
-        self.tray.setContextMenu(self.menu)
-        self.tray.setToolTip(tooltip)
-        self.tray.showMessage('one', 'two', QtGui.QIcon(iconpath))
+#         # Create the tray app
+#         self.tray = QtWidgets.QSystemTrayIcon(self.icon, self.widget)
+#         self.tray.setContextMenu(self.menu)
+#         self.tray.setToolTip(tooltip)
+#         self.tray.showMessage('one', 'two', QtGui.QIcon(iconpath))
 
-        # Show app
-        self.tray.show()
+#         # Show app
+#         self.tray.show()
 
-    def restore_layout(self):
-        raise Exception('Not implemented')
+#     def restore_layout(self):
+#         raise Exception('Not implemented')
 
-    def freeze_layout(self):
-        logger.info('Freezing layout')
+#     def freeze_layout(self):
+#         logger.info('Freezing layout')
 
-        # get current displays layout
-        display_layout = osscreen.enum_displays(self.app)
+#         # get current displays layout
+#         display_layout = osscreen.enum_displays(self.app)
 
-        # find opened apps windows
-        opened_windows = osscreen.enum_opened_windows(display_layout['screens'])
+#         # find opened apps windows
+#         opened_windows = osscreen.enum_opened_windows(display_layout['screens'])
 
-        # (ps)(debug)
-        #self.db.clear()
+#         # (ps)(debug)
+#         #self.db.clear()
 
-        # search database for saved app configurations for current display layout
-        layout_app_configs = db_enum_apps_for_curr_layout(self.db, display_layout['hash'])
-        layout_apps = extract_process_names(layout_app_configs)
+#         # search database for saved app configurations for current display layout
+#         layout_app_configs = db_enum_apps_for_curr_layout(self.db, display_layout['hash'])
+#         layout_apps = extract_process_names(layout_app_configs)
 
-        # add each app config to database
-        logger.debug('Adding to database app configs for opened winows')
-        for window in opened_windows:
-            simplified_app_config = simplify_app_config(opened_windows[window])
-            window_reference_log = f'\"{opened_windows[window]["window_title"]}\" ({opened_windows[window]["process_name"]})'
+#         # add each app config to database
+#         logger.debug('Adding to database app configs for opened winows')
+#         for window in opened_windows:
+#             simplified_app_config = simplify_app_config(opened_windows[window])
+#             window_reference_log = f'\"{opened_windows[window]["window_title"]}\" ({opened_windows[window]["process_name"]})'
 
-            # skip if window is not visible or does not fit into active screens:
-            if opened_windows[window]["display_index"] < 0:
-                logger.debug(
-                    f'Skipping window {window_reference_log}')
-                logger.debug(
-                    '(reason: Window is not visible or out of displays boundaries')
-                continue
+#             # skip if window is not visible or does not fit into active screens:
+#             if opened_windows[window]["display_index"] < 0:
+#                 logger.debug(
+#                     f'Skipping window {window_reference_log}')
+#                 logger.debug(
+#                     '(reason: Window is not visible or out of displays boundaries')
+#                 continue
 
-            # skip if the same exact app config is already in database
-            if layout_app_configs:
-                #if simplified_app_config in layout_app_configs:
-                if opened_windows[window]['process_name'] in layout_apps:
-                    logger.debug(
-                        f'Skipping window {window_reference_log}')
-                    logger.debug('(reason: already in database; use "Freeze Layout (replace)" to force-update)')
-                    continue
+#             # skip if the same exact app config is already in database
+#             if layout_app_configs:
+#                 #if simplified_app_config in layout_app_configs:
+#                 if opened_windows[window]['process_name'] in layout_apps:
+#                     logger.debug(
+#                         f'Skipping window {window_reference_log}')
+#                     logger.debug('(reason: already in database; use "Freeze Layout (replace)" to force-update)')
+#                     continue
 
-            # add unique and valid config to database
-            db_add_app_config(self.db, display_layout['hash'], simplified_app_config)
+#             # add unique and valid config to database
+#             db_add_app_config(self.db, display_layout['hash'], simplified_app_config)
 
-        # (ps)(debug)
-        #print(self.db.list_all())
+#         # (ps)(debug)
+#         #print(self.db.list_all())
 
         
-    def open_preferences(self):
-        # keyboard shortcuts
-        # snap to the grid
+#     def open_preferences(self):
+#         # keyboard shortcuts
+#         # snap to the grid
 
-        raise Exception('Not implemented')
+#         raise Exception('Not implemented')
 
 
 

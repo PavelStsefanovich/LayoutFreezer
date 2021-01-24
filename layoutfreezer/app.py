@@ -1,10 +1,11 @@
+from layoutfreezer import helpers
+from layoutfreezer.db import Database
 import logging
-import sys
-import traceback
-from .db import Database
 from PySide2 import QtGui
 from PySide2 import QtWidgets
 from os import path, makedirs
+import sys
+import traceback
 
 
 ##########  Global Properties  ####################
@@ -16,11 +17,12 @@ logger = logging.getLogger(__name__)
 
 class SystemTrayApp():
 
-    def __init__(self, iconpath, tooltip='SystemTrayApp', database_path='database'):
+    def __init__(self, iconpath, tooltip='SystemTrayApp', database_path='database', osscrn=None):
+        self.osscrn = osscrn
+
         # Initiate database connection
-        database_path = database_path.replace('~', path.expanduser('~'))
         database_path = path.abspath(database_path)
-        logger.debug(f'Database path: {database_path}')
+        logger.debug(f'database path: {database_path}')
         makedirs(path.split(database_path)[0], exist_ok=True)
         self.db = Database(database_path)
 
@@ -36,8 +38,8 @@ class SystemTrayApp():
         self.menu_action_raise = self.menu.addAction("Restore Layout")
         self.menu_action_raise.triggered.connect(self.restore_layout)
 
-        # self.menu_action_raise = self.menu.addAction("Freeze Layout")
-        # self.menu_action_raise.triggered.connect(self.freeze_layout)
+        self.menu_action_raise = self.menu.addAction("Freeze Layout")
+        self.menu_action_raise.triggered.connect(self.freeze_layout)
 
         self.menu_action_raise = self.menu.addSeparator()
 
@@ -51,7 +53,7 @@ class SystemTrayApp():
 
         # Create app icon
         iconpath = path.abspath(iconpath)
-        logger.debug(f'SystemTray icon path: {iconpath}')
+        logger.debug(f'systemTray icon path: {iconpath}')
         self.icon = QtGui.QIcon(iconpath)
 
         # Create the tray app
@@ -66,11 +68,12 @@ class SystemTrayApp():
     def restore_layout(self):
         raise Exception('Not implemented')
 
-    # def freeze_layout(self):
-    #     logger.info('Freezing layout')
+    def freeze_layout(self):
+        logger.info('USER COMMAND: "Freeze Layout"')
 
-    #     # get current displays layout
-    #     display_layout = osscreen.enum_displays(self.app)
+        # get current displays layout
+        display_layout = self.osscrn.enum_displays(self.app)
+        pass
 
     #     # find opened apps windows
     #     opened_windows = osscreen.enum_opened_windows(
@@ -130,14 +133,24 @@ def excepthook(exc_type, exc_value, exc_tb):
 
 
 def run(main_config):
-    #TODO: validate main_config
+    logger.debug("gathering system info")
+    main_config.update({'system': helpers.get_system_info()})
+
     logger.debug("initializing systray app")
     sys.excepthook = excepthook
+    osscrn = None
+    if main_config["system"]["os"] == 'Windows':
+        import layoutfreezer.os_screen.windows as osscrn
+    if main_config["system"]["os"] == 'Linux':
+        import layoutfreezer.os_screen.linux as osscrn
+    if main_config["system"]["os"] == 'Mac':
+        import layoutfreezer.os_screen.mac as osscrn
 
     trayapp = SystemTrayApp(
         iconpath=main_config["systray_icon"],
         tooltip=f'{main_config["product_name"]} {main_config["version"]}',
-        database_path=main_config["database_path"]
+        database_path=main_config["database_path"],
+        osscrn=osscrn
     )
 
     trayapp.tray.showMessage(f'{main_config["product_name"]} has started',

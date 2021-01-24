@@ -74,7 +74,7 @@ def errpopup(errormessage=None, level=None):
         show_critical_error_dialog(errormessage=errormessage)
 
 
-def dict_replace_placeholders(dic1=None, dic2=None):
+def dict_expand_vars(dic1=None, dic2=None):
     if not dic1:
         return dic1
     if not dic2:
@@ -82,16 +82,24 @@ def dict_replace_placeholders(dic1=None, dic2=None):
     dic = dic1.copy()
     for el in dic1:
         if isinstance(dic1[el], dict):
-            dic[el] = dict_replace_placeholders(dic[el], dic)
+            dic[el] = dict_expand_vars(dic[el], dic)
             continue
         if isinstance(dic1[el], str):
-            el_placeholders = re.findall('\{\w+\}', dic[el])
+            if re.match(r'^\~[\\\/]', dic[el]):
+                dic[el] = re.sub(
+                    r'^\~(?=[\\\/])', os.path.expanduser('~').replace('\\', '/'), dic[el])
+            el_placeholders = re.findall(r'\{\w+\}', dic[el])
             for placeholder in el_placeholders:
-                placeholder_value = dic2.get(placeholder.strip('{}'))
-                if placeholder_value:
-                    if isinstance(placeholder_value, str):
+                env_var = re.match(r'^env_(\w+)', placeholder.strip('{}'))
+                if env_var:
+                    if env_var[1] in os.environ:
                         dic[el] = dic[el].replace(
-                            placeholder, placeholder_value)
+                            placeholder, os.environ[env_var[1]])
+                    continue
+                placeholder_value = dic2.get(placeholder.strip('{}'))
+                if isinstance(placeholder_value, str):
+                    dic[el] = dic[el].replace(
+                        placeholder, placeholder_value)
 
     return dic
 

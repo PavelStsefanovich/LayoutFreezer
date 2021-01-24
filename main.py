@@ -34,9 +34,9 @@ def init():
         helpers.errpopup(errormessage=errormessage, level='critical')
         sys.exit()
 
-    main_config = helpers.dict_replace_placeholders(main_config)
+    main_config = helpers.dict_expand_vars(main_config)
 
-    # setup logger    
+    # setup logger
     try:
         helpers.setup_logger(
             logger_config_path=main_config["logger_config"].replace('@root_dir@', main_config["root_dir"]),
@@ -56,7 +56,6 @@ def run():
     global main_config
     try:
         logger.info('Starting application')
-        # preferences_path = main_config['layout']['preferences_path']
         app.run(main_config)
     except Exception as e:
         logger.error('FATAL EXCEPTION OCCURRED:')

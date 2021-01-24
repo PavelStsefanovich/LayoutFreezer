@@ -1,12 +1,13 @@
+from datetime import datetime
+from .gui import show_critical_error_dialog
 import json
 import logging
 import logging.config
 import os
+import platform
 import re
 import sys
 import yaml
-from datetime import datetime
-from .gui import show_critical_error_dialog
 
 
 ##########  Global Properties  ####################
@@ -100,8 +101,14 @@ def dict_expand_vars(dic1=None, dic2=None):
                 if isinstance(placeholder_value, str):
                     dic[el] = dic[el].replace(
                         placeholder, placeholder_value)
-
     return dic
+
+
+def get_system_info():
+    sys_info = {}
+    sys_info["os"] = platform.system()
+    # more entries as needed
+    return sys_info
 
 
 ##########  Main  #################################

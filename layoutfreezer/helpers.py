@@ -6,6 +6,7 @@ import logging.config
 import os
 import platform
 import re
+from shutil import copyfile
 import sys
 import yaml
 

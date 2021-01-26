@@ -17,8 +17,9 @@ logger = logging.getLogger(__name__)
 
 class SystemTrayApp():
 
-    def __init__(self, iconpath, tooltip='SystemTrayApp', database_path='database', osscrn=None):
+    def __init__(self, iconpath, tooltip='SystemTrayApp', database_path='database', osscrn=None, prefs=None):
         self.osscrn = osscrn
+        self.prefs = prefs
 
         # Initiate database connection
         database_path = path.abspath(database_path)
@@ -26,20 +27,17 @@ class SystemTrayApp():
         makedirs(path.split(database_path)[0], exist_ok=True)
         self.db = Database(database_path)
 
-        # Set preferences file path
-        # self.preferences_path = path.abspath(preferences_path)
-
         # Init QApplication, QWidet and QMenu
         self.app = QtWidgets.QApplication([])
         self.widget = QtWidgets.QWidget()
         self.menu = QtWidgets.QMenu(self.widget)
 
         # Add items to menu
-        self.menu_action_raise = self.menu.addAction("Restore Layout")
-        self.menu_action_raise.triggered.connect(self.restore_layout)
-
         self.menu_action_raise = self.menu.addAction("Freeze Layout")
         self.menu_action_raise.triggered.connect(self.freeze_layout)
+
+        self.menu_action_raise = self.menu.addAction("Restore Layout")
+        self.menu_action_raise.triggered.connect(self.restore_layout)
 
         self.menu_action_raise = self.menu.addSeparator()
 
@@ -73,11 +71,10 @@ class SystemTrayApp():
 
         # get current displays layout
         display_layout = self.osscrn.enum_displays(self.app)
-        pass
 
-    #     # find opened apps windows
-    #     opened_windows = osscreen.enum_opened_windows(
-    #         display_layout['screens'])
+        # find opened apps windows
+        opened_windows = self.osscrn.enum_opened_windows(
+            display_layout['screens'], self.prefs)
 
     #     # (ps)(debug)
     #     #self.db.clear()
@@ -117,6 +114,7 @@ class SystemTrayApp():
 
         # (ps)(debug)
         #print(self.db.list_all())
+        pass
 
     def open_preferences(self):
         # keyboard shortcuts
@@ -130,6 +128,21 @@ class SystemTrayApp():
 def excepthook(exc_type, exc_value, exc_tb):
     trace = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     logger.error(trace)
+
+
+def load_preferences(preferences_path, preferences_default):
+    preferences_path = path.abspath(preferences_path)
+    preferences_default = path.abspath(preferences_default)
+    logger.debug(f'preferences path: {preferences_path}')
+    makedirs(path.split(preferences_path)[0], exist_ok=True)
+    try:
+        prefs = helpers.load_config_yml(preferences_path)
+    except Exception as e:
+        logger.debug(e)
+        logger.debug(f'copying default preferences from file "{preferences_default}"')
+        helpers.copyfile(preferences_default, preferences_path)
+        prefs = helpers.load_config_yml(preferences_path)
+    return prefs
 
 
 def run(main_config):
@@ -146,11 +159,15 @@ def run(main_config):
     if main_config["system"]["os"] == 'Mac':
         import layoutfreezer.os_screen.mac as osscrn
 
+    prefs = load_preferences(
+        main_config["preferences_path"], main_config["preferences_default"])
+
     trayapp = SystemTrayApp(
         iconpath=main_config["systray_icon"],
         tooltip=f'{main_config["product_name"]} {main_config["version"]}',
         database_path=main_config["database_path"],
-        osscrn=osscrn
+        osscrn=osscrn,
+        prefs=prefs
     )
 
     trayapp.tray.showMessage(f'{main_config["product_name"]} has started',

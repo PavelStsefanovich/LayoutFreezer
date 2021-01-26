@@ -1,0 +1,6 @@
+# when freezing layout, round each window coordinates to the nearest 0 or 5.
+# for example: "12, 179, 517, 311" will become "10, 180, 515, 310"
+snap_to_grid: True
+
+# when freezing layout, restore and include minimized windows
+restore_minimized: False

@@ -1,24 +1,18 @@
-#import clr
 import hashlib
 import logging
+from operator import itemgetter
 import os
+from PySide2 import QtCore
 import sys
-import win32con as wcon
 import win32api as wapi
+import win32con as wcon
 import win32gui as wgui
 import win32process as wproc
-
-from operator import itemgetter
-from PySide2 import QtCore
-
 
 
 ##########  Module Properties  ####################
 
 logger = logging.getLogger(__name__)
-#clr.AddReference("System.Windows.Forms")
-#from System.Windows.Forms import Screen
-
 
 
 ##########  Functions  ############################
@@ -87,51 +81,55 @@ def callback(hwnd, callback_param):
         if text:
             style = wapi.GetWindowLong(hwnd, wcon.GWL_STYLE)
             if style & wcon.WS_VISIBLE:
-                
-                wgui.ShowWindow(hwnd, 9)
+                include = True
+                if wgui.IsIconic(hwnd):
+                    if callback_param["prefs"]["restore_minimized"]:
+                        wgui.ShowWindow(hwnd, 9)
+                    else:
+                        include = False
 
-                rect = wgui.GetWindowRect(hwnd)
-                width = rect[2] - rect[0]
-                height = rect[3] - rect[1]
-                size = (width, height)
+                if include:
+                    rect = wgui.GetWindowRect(hwnd)
+                    width = rect[2] - rect[0]
+                    height = rect[3] - rect[1]
+                    size = (width, height)
 
-                if width > 1 and height > 1:
-                    try:
-                        proc = wapi.OpenProcess(wcon.PROCESS_ALL_ACCESS, 0, pid)
-                        executable_path = wproc.GetModuleFileNameEx(proc, None)
-                        process_name = os.path.basename(executable_path)
+                    if width > 1 and height > 1:
+                        try:
+                            proc = wapi.OpenProcess(wcon.PROCESS_ALL_ACCESS, 0, pid)
+                            executable_path = wproc.GetModuleFileNameEx(proc, None)
+                            process_name = os.path.basename(executable_path)
 
-                        callback_param['windows_dict'].update({hwnd: {}})
-                        callback_param['windows_dict'][hwnd].update({'pid' : pid})
-                        callback_param['windows_dict'][hwnd].update({'process_name' : process_name})
-                        callback_param['windows_dict'][hwnd].update({'executable_path' : executable_path})
-                        callback_param['windows_dict'][hwnd].update({'window_title' : text})
-                        callback_param['windows_dict'][hwnd].update({'window_rectangle': rect})
+                            callback_param['windows_dict'].update({hwnd: {}})
+                            callback_param['windows_dict'][hwnd].update({'pid' : pid})
+                            callback_param['windows_dict'][hwnd].update({'process_name' : process_name})
+                            callback_param['windows_dict'][hwnd].update({'executable_path' : executable_path})
+                            callback_param['windows_dict'][hwnd].update({'window_title' : text})
+                            callback_param['windows_dict'][hwnd].update({'window_rectangle': rect})
 
-                        display_index = get_display_index(callback_param['screens'], rect)
-                        display_orientation = callback_param['screens'][display_index]['orientation']
-                        display_primary = callback_param['screens'][display_index]['primary']
-                        
-                        callback_param['windows_dict'][hwnd].update({'display_index': display_index})
-                        callback_param['windows_dict'][hwnd].update({'display_orientation': display_orientation})
-                        callback_param['windows_dict'][hwnd].update({'display_primary': display_primary})
+                            display_index = get_display_index(callback_param['screens'], rect)
+                            display_orientation = callback_param['screens'][display_index]['orientation']
+                            display_primary = callback_param['screens'][display_index]['primary']
 
-                        logger.debug(f'Window: {hwnd}: {callback_param["windows_dict"][hwnd]}')
+                            callback_param['windows_dict'][hwnd].update({'display_index': display_index})
+                            callback_param['windows_dict'][hwnd].update({'display_orientation': display_orientation})
+                            callback_param['windows_dict'][hwnd].update({'display_primary': display_primary})
 
-                    except:
-                        pass
+                            logger.debug(f'Window: {hwnd}: {callback_param["windows_dict"][hwnd]}')
 
-                    try:
-                        wapi.CloseHandle(proc)
-                    except:
-                        pass
+                        except:
+                            pass
+
+                        try:
+                            wapi.CloseHandle(proc)
+                        except:
+                            pass
 
 
-def enum_opened_windows(screens):
+def enum_opened_windows(screens, prefs):
     callback_param = {'screens' : screens}
     callback_param.update({'windows_dict' : {}})
-    # windows_dict = {}
-    # wgui.EnumWindows(callback, windows_dict)
+    callback_param.update({'prefs' : prefs})
     wgui.EnumWindows(callback, callback_param)
     return callback_param['windows_dict']
 

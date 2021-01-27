@@ -1,4 +1,13 @@
+import logging
 import sqlite3
+
+
+##########  Global Properties  ####################
+
+logger = logging.getLogger(__name__)
+
+
+##########  Classes  ##############################
 
 class Database:
 
@@ -61,3 +70,12 @@ class Database:
 
     def __del__(self):
         self.conn.close()
+
+
+##########  Functions  ############################
+
+
+
+##########  Main  #################################
+if __name__ == "__main__":
+    raise Exception('This module is not intended to run as __main__')

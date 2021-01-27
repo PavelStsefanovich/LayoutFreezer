@@ -146,11 +146,12 @@ def load_preferences(preferences_path, preferences_default):
 
 
 def run(main_config):
+    sys.excepthook = excepthook
+
     logger.debug("gathering system info")
     main_config.update({'system': helpers.get_system_info()})
 
-    logger.debug("initializing systray app")
-    sys.excepthook = excepthook
+    logger.debug("importing os-specific screen module")
     osscrn = None
     if main_config["system"]["os"] == 'Windows':
         import layoutfreezer.os_screen.windows as osscrn
@@ -162,6 +163,7 @@ def run(main_config):
     prefs = load_preferences(
         main_config["preferences_path"], main_config["preferences_default"])
 
+    logger.debug("initializing systray app")
     trayapp = SystemTrayApp(
         iconpath=main_config["systray_icon"],
         tooltip=f'{main_config["product_name"]} {main_config["version"]}',

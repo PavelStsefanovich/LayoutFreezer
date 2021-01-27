@@ -1,4 +1,3 @@
-import os
 import sqlite3
 
 class Database:
@@ -23,15 +22,18 @@ class Database:
             is_default BOOLEAN)""")
         self.conn.commit()
 
+
     def add(self, dl_hash=None, name=None, title=None, rect=None, index=None, orientation=None, is_default=0):
         self.cur.execute("INSERT OR REPLACE INTO apps VALUES (NULL, ?,?,?,?,?,?,?)",
                          (dl_hash, name, title, rect, index, orientation, is_default))
         self.conn.commit()
 
+
     def list_all(self):
         self.cur.execute("SELECT * FROM apps")
         rows = self.cur.fetchall()
         return rows
+
 
     def search(self, dl_hash="", name="", title="", rect="", index=-1, orientation="", order_by=""):
 
@@ -47,8 +49,9 @@ class Database:
             query += f"\n ORDER BY {order_by}"
 
         self.cur.execute(query, (dl_hash, name, title, rect, index, orientation))
-        rows = self.cur.fetchall()        
+        rows = self.cur.fetchall()
         return rows
+
 
     def clear(self, table_name='apps'):
         self.cur.execute("DROP TABLE IF EXISTS apps")

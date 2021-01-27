@@ -112,6 +112,42 @@ def get_system_info():
     return sys_info
 
 
+def db_enum_apps_for_curr_screen_layout(db, dl_hash, simplify=True):
+    layout_app_configs = db.search(dl_hash=dl_hash, order_by='process_name')
+
+    logger.debug(
+        f'looking for app configurations in database for screen layout {dl_hash}')
+    if simplify:
+        results = []
+        for item in layout_app_configs:
+            results.append(item[2:-1])
+    else:
+        results = layout_app_configs
+
+    if results:
+        logger.debug(f'found app configurations: {results}')
+    else:
+        logger.debug(f'no app configurations found for screen layout {dl_hash}')
+
+    return results
+
+
+def extract_process_names(layout_app_configs):
+    proc_names = []
+    for app_config in layout_app_configs:
+        proc_names.append(app_config[0])
+    return proc_names
+
+
+def simplify_app_config(app_config):
+    result = (app_config['process_name'],
+              app_config['window_title'],
+              str(app_config['window_rectangle']),
+              app_config['display_index'],
+              app_config['display_orientation'])
+    return result
+
+
 ##########  Main  #################################
 
 if __name__ == "__main__":

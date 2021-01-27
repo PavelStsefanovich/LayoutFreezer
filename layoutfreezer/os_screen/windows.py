@@ -10,7 +10,7 @@ import win32gui as wgui
 import win32process as wproc
 
 
-##########  Module Properties  ####################
+##########  Global Properties  ####################
 
 logger = logging.getLogger(__name__)
 
@@ -23,18 +23,14 @@ def get_hash(source_object):
 
 
 def get_display_index(screens, win_rectangle):
-
     for scr_index in range(0, len(screens)):
         scr_rectangle = screens[scr_index]['rectangle']
-
-        if win_rectangle[0] < scr_rectangle[0] or win_rectangle[0] > scr_rectangle[2]:
-            continue
-
-        if win_rectangle[1] < scr_rectangle[1] or win_rectangle[1] > scr_rectangle[3]:
-            continue
-
-        return scr_index
-
+        if win_rectangle[0] >= scr_rectangle[0] and win_rectangle[0] <= scr_rectangle[2]:
+            return scr_index
+        if scr_index == 0 and win_rectangle[0] < scr_rectangle[0]:
+            return 0
+    if win_rectangle[0] > scr_rectangle[2]:
+            return (len(screens) - 1)
     return -1
 
 
@@ -43,7 +39,7 @@ def adjust_rect_to_grid(rect):
     for i in range(len(rect)):
         mod = rect[i] % 5
         if mod > 0:
-            if mod < 3:                
+            if mod < 3:
                 rect_adjusted.append(rect[i] - mod)
             else:
                 rect_adjusted.append(rect[i] + (5 - mod))

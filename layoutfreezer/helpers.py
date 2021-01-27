@@ -116,7 +116,7 @@ def db_enum_apps_for_curr_screen_layout(db, dl_hash, simplify=True):
     layout_app_configs = db.search(dl_hash=dl_hash, order_by='process_name')
 
     logger.debug(
-        f'looking for app configurations in database for screen layout {dl_hash}')
+        f'looking in database for saved apps display configurations for screens layout "{dl_hash}"')
     if simplify:
         results = []
         for item in layout_app_configs:
@@ -125,9 +125,9 @@ def db_enum_apps_for_curr_screen_layout(db, dl_hash, simplify=True):
         results = layout_app_configs
 
     if results:
-        logger.debug(f'found app configurations: {results}')
+        logger.debug(f'found app display configurations: {results}')
     else:
-        logger.debug(f'no app configurations found for screen layout {dl_hash}')
+        logger.debug(f'no app display configurations found for screens layout "{dl_hash}"')
 
     return results
 

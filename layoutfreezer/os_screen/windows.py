@@ -84,15 +84,15 @@ def enum_displays(qtapp):
 
         displays.append(display)
 
-        logger.debug(f'Display: {display}')
+        logger.debug(f'display: {display}')
 
     # sort displays to list them from left to right
     # (leftmost display has index 0)
     displays = sorted(displays, key=itemgetter(['rectangle'][0]))
 
     hsh = get_hash(displays)
-    logger.debug(f'Current display layout: {displays}')
-    logger.debug(f'Current display layout hash: {hsh}')
+    logger.debug(f'current screens layout: {displays}')
+    logger.debug(f'current screens layout hash: {hsh}')
     return {'screens' : displays, 'hash' : hsh}
 
 
@@ -150,7 +150,7 @@ def callback(hwnd, callback_param):
                                 move_window(hwnd, rect)
                             callback_param['windows_dict'][hwnd].update({'window_rectangle': rect})
 
-                            logger.debug(f'Window: {hwnd}: {callback_param["windows_dict"][hwnd]}')
+                            logger.debug(f'window: {hwnd}: {callback_param["windows_dict"][hwnd]}')
                         except:
                             pass
 

@@ -69,26 +69,23 @@ class SystemTrayApp():
     def freeze_layout(self):
         logger.info('USER COMMAND: "Freeze Layout"')
 
-        # get current displays layout
+        logger.info('Getting current screens layout')
         display_layout = self.osscrn.enum_displays(self.app)
 
-        # find opened apps windows
+        logger.info('Looking for opened windows')
         opened_windows = self.osscrn.enum_opened_windows(
             display_layout['screens'], self.prefs)
 
-    #     # (ps)(debug)
-    #     #self.db.clear()
+        # search database for saved app configurations for current screens layout
+        layout_app_configs = helpers.db_enum_apps_for_curr_screen_layout(
+            self.db, display_layout['hash'])
+        layout_apps = helpers.extract_process_names(layout_app_configs)
 
-    #     # search database for saved app configurations for current display layout
-    #     layout_app_configs = db_enum_apps_for_curr_layout(
-    #         self.db, display_layout['hash'])
-    #     layout_apps = extract_process_names(layout_app_configs)
-
-    #     # add each app config to database
-    #     logger.debug('Adding to database app configs for opened winows')
-    #     for window in opened_windows:
-    #         simplified_app_config = simplify_app_config(opened_windows[window])
-    #         window_reference_log = f'\"{opened_windows[window]["window_title"]}\" ({opened_windows[window]["process_name"]})'
+        # add each app config to database
+        #(ps)logger.debug('Adding to database app configs for opened winows')
+        for window in opened_windows:
+            simplified_app_config = helpers.simplify_app_config(opened_windows[window])
+            window_reference_log = f'\"{opened_windows[window]["window_title"]}\" ({opened_windows[window]["process_name"]})'
 
     #         # skip if window is not visible or does not fit into active screens:
     #         if opened_windows[window]["display_index"] < 0:
@@ -112,7 +109,8 @@ class SystemTrayApp():
     #         db_add_app_config(
     #             self.db, display_layout['hash'], simplified_app_config)
 
-        # (ps)(debug)
+        #TODO remove
+        # self.db.clear()
         #print(self.db.list_all())
         pass
 
@@ -133,7 +131,7 @@ def excepthook(exc_type, exc_value, exc_tb):
 def load_preferences(preferences_path, preferences_default):
     preferences_path = path.abspath(preferences_path)
     preferences_default = path.abspath(preferences_default)
-    logger.debug(f'preferences path: {preferences_path}')
+    logger.debug(f'preferences file path: {preferences_path}')
     makedirs(path.split(preferences_path)[0], exist_ok=True)
     try:
         prefs = helpers.load_config_yml(preferences_path)
@@ -148,10 +146,11 @@ def load_preferences(preferences_path, preferences_default):
 def run(main_config):
     sys.excepthook = excepthook
 
-    logger.debug("gathering system info")
+    logger.info("Gathering system info")
     main_config.update({'system': helpers.get_system_info()})
 
-    logger.debug("importing os-specific screen module")
+    logger.info("Importing OS-specific screen module")
+    logger.debug(f'current os: {main_config["system"]["os"]}')
     osscrn = None
     if main_config["system"]["os"] == 'Windows':
         import layoutfreezer.os_screen.windows as osscrn
@@ -160,10 +159,11 @@ def run(main_config):
     if main_config["system"]["os"] == 'Mac':
         import layoutfreezer.os_screen.mac as osscrn
 
+    logger.info('Loading preferences')
     prefs = load_preferences(
         main_config["preferences_path"], main_config["preferences_default"])
 
-    logger.debug("initializing systray app")
+    logger.info("Initializing systray app")
     trayapp = SystemTrayApp(
         iconpath=main_config["systray_icon"],
         tooltip=f'{main_config["product_name"]} {main_config["version"]}',

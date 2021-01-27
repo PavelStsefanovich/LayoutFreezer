@@ -38,6 +38,20 @@ def get_display_index(screens, win_rectangle):
     return -1
 
 
+def adjust_rect_to_grid(rect):
+    rect_adjusted = []
+    for i in range(len(rect)):
+        mod = rect[i] % 5
+        if mod > 0:
+            if mod < 3:                
+                rect_adjusted.append(rect[i] - mod)
+            else:
+                rect_adjusted.append(rect[i] + (5 - mod))
+        else:
+            rect_adjusted.append(rect[i])
+    return rect_adjusted
+
+
 def enum_displays(qtapp):
     displays = []
     screens = qtapp.screens()
@@ -92,9 +106,11 @@ def callback(hwnd, callback_param):
                     rect = wgui.GetWindowRect(hwnd)
                     width = rect[2] - rect[0]
                     height = rect[3] - rect[1]
-                    size = (width, height)
 
                     if width > 1 and height > 1:
+                        if callback_param["prefs"]["snap_to_grid"]:
+                            rect = adjust_rect_to_grid(rect)
+
                         try:
                             proc = wapi.OpenProcess(wcon.PROCESS_ALL_ACCESS, 0, pid)
                             executable_path = wproc.GetModuleFileNameEx(proc, None)

@@ -48,19 +48,35 @@ def adjust_rect_to_grid(rect):
     return rect_adjusted
 
 
+def fit_rect_into_screen(rect, screen_rect):
+    rect_adjusted = []
+    for coord in rect:
+        rect_adjusted.append(coord)
+    if rect_adjusted[0] < screen_rect[0]:
+        rect_adjusted[0] = screen_rect[0]
+    if rect_adjusted[1] < screen_rect[1]:
+        rect_adjusted[1] = screen_rect[1]
+    if rect_adjusted[2] > screen_rect[2]:
+        rect_adjusted[2] = screen_rect[2]
+    if rect_adjusted[3] > screen_rect[3]:
+        rect_adjusted[3] = screen_rect[3]
+    return rect_adjusted
+
+
 def enum_displays(qtapp):
     displays = []
     screens = qtapp.screens()
 
     for scr in screens:
-        rect = scr.geometry().getRect()
+        rect = scr.availableGeometry().getRect()
         rectangle = [rect[0], rect[1], rect[0]+rect[2], rect[1]+rect[3]]
         display = {}
         display.update({'primary': False})
         display.update({'orientation': 'landscape'})
         display.update({'rectangle': rectangle})
 
-        if rectangle[0] == 0 and rectangle[1] == 0:
+        full_rect = scr.geometry().getRect()
+        if full_rect[0] == 0 and full_rect[1] == 0:
             display['primary'] = True
 
         if scr.orientation() is QtCore.Qt.ScreenOrientation.PortraitOrientation:
@@ -81,7 +97,8 @@ def enum_displays(qtapp):
 
 
 def move_window(hwnd, rect):
-    pass
+    wgui.MoveWindow(hwnd, rect[0], rect[1],
+                    rect[2] - rect[0], rect[3] - rect[1], True)
 
 
 def callback(hwnd, callback_param):
@@ -104,9 +121,6 @@ def callback(hwnd, callback_param):
                     height = rect[3] - rect[1]
 
                     if width > 1 and height > 1:
-                        if callback_param["prefs"]["snap_to_grid"]:
-                            rect = adjust_rect_to_grid(rect)
-
                         try:
                             proc = wapi.OpenProcess(wcon.PROCESS_ALL_ACCESS, 0, pid)
                             executable_path = wproc.GetModuleFileNameEx(proc, None)
@@ -117,18 +131,26 @@ def callback(hwnd, callback_param):
                             callback_param['windows_dict'][hwnd].update({'process_name' : process_name})
                             callback_param['windows_dict'][hwnd].update({'executable_path' : executable_path})
                             callback_param['windows_dict'][hwnd].update({'window_title' : text})
-                            callback_param['windows_dict'][hwnd].update({'window_rectangle': rect})
 
                             display_index = get_display_index(callback_param['screens'], rect)
                             display_orientation = callback_param['screens'][display_index]['orientation']
                             display_primary = callback_param['screens'][display_index]['primary']
-
                             callback_param['windows_dict'][hwnd].update({'display_index': display_index})
                             callback_param['windows_dict'][hwnd].update({'display_orientation': display_orientation})
                             callback_param['windows_dict'][hwnd].update({'display_primary': display_primary})
 
-                            logger.debug(f'Window: {hwnd}: {callback_param["windows_dict"][hwnd]}')
+                            move = False
+                            if callback_param["prefs"]["snap_to_grid"]:
+                                rect = adjust_rect_to_grid(rect)
+                                move = True
+                            if callback_param["prefs"]["fit_into_screen"]:
+                                rect = fit_rect_into_screen(rect, callback_param["screens"][display_index]['rectangle'])
+                                move = True
+                            if move:
+                                move_window(hwnd, rect)
+                            callback_param['windows_dict'][hwnd].update({'window_rectangle': rect})
 
+                            logger.debug(f'Window: {hwnd}: {callback_param["windows_dict"][hwnd]}')
                         except:
                             pass
 

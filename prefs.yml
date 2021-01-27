@@ -1,14 +1,10 @@
-### FREEZE
-
 # when freezing layout, round each window coordinates to the nearest 0 or 5
-# this makes windows line up evenly
+# this makes it easier to line up windows evenly
 # for example: "12, 179, 517, 311" will become "10, 180, 515, 310"
 snap_to_grid: True
 
 # when freezing layout, restore and include minimized windows
 restore_minimized: False
 
-### RESTORE
-
-# when restoring layout, adjust windows coordinates to fit into screen boundaries
+# when freezing or restoring layout, adjust windows coordinates to fit into screen boundaries
 fit_into_screen: True

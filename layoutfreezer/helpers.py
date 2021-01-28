@@ -112,40 +112,59 @@ def get_system_info():
     return sys_info
 
 
-def db_enum_apps_for_curr_screen_layout(db, dl_hash, simplify=True):
+def db_enum_apps_for_curr_screen_layout(db, dl_hash, normalize=True):
+    logger.debug(f'looking in database for saved app position configurations for screen layout "{dl_hash}"')
     layout_app_configs = db.search(dl_hash=dl_hash, order_by='process_name')
 
-    logger.debug(
-        f'looking in database for saved apps display configurations for screens layout "{dl_hash}"')
-    if simplify:
+    if normalize:
         results = []
         for item in layout_app_configs:
-            results.append(item[2:-1])
+            results.append(item[2:])
     else:
         results = layout_app_configs
 
     if results:
-        logger.debug(f'found app display configurations: {results}')
+        logger.debug(f'found saved app position configurations: {results}')
     else:
-        logger.debug(f'no app display configurations found for screens layout "{dl_hash}"')
+        logger.debug(f'no saved app position configurations found for screen layout "{dl_hash}"')
 
     return results
 
 
-def extract_process_names(layout_app_configs):
-    proc_names = []
-    for app_config in layout_app_configs:
-        proc_names.append(app_config[0])
-    return proc_names
+def db_add_app_config(db, dl_hash, normalized_app_config):
+    logger.debug(f'adding to database: {normalized_app_config}')
+    db.add(
+        dl_hash,
+        normalized_app_config[0],
+        normalized_app_config[1],
+        normalized_app_config[2],
+        normalized_app_config[3],
+        normalized_app_config[4],
+        normalized_app_config[5]
+    )
 
 
-def simplify_app_config(app_config):
-    result = (app_config['process_name'],
-              app_config['window_title'],
-              str(app_config['window_rectangle']),
-              app_config['display_index'],
-              app_config['display_orientation'])
+def db_delete_app_config(db, dl_hash, normalized_app_config):
+    #TODO: implement
+    # saved_config = db.search(dl_hash=dl_hash
+    pass
+
+
+def normalize_app_config(app_config):
+    result = (
+        app_config['process_name'],
+        app_config['window_title'],
+        str(app_config['window_rectangle']),
+        app_config['display_index'],
+        app_config['display_orientation'],
+        int(app_config['display_primary'])
+    )
     return result
+
+
+def app_config_already_saved(normalized_app_config, saved_app_configs):
+    #TODO: implement
+    return True
 
 
 ##########  Main  #################################

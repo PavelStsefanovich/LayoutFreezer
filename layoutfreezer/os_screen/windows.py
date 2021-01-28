@@ -24,13 +24,13 @@ def get_hash(source_object):
 
 def get_display_index(screens, win_rectangle):
     for scr_index in range(0, len(screens)):
-        scr_rectangle = screens[scr_index]['rectangle']
+        scr_rectangle = screens[scr_index]['full_rectangle']
         if win_rectangle[0] >= scr_rectangle[0] and win_rectangle[0] <= scr_rectangle[2]:
             return scr_index
         if scr_index == 0 and win_rectangle[0] < scr_rectangle[0]:
             return 0
     if win_rectangle[0] > scr_rectangle[2]:
-            return (len(screens) - 1)
+        return (len(screens) - 1)
     return -1
 
 
@@ -63,6 +63,13 @@ def fit_rect_into_screen(rect, screen_rect):
     return rect_adjusted
 
 
+def is_maximized(hwnd):
+    placement = wgui.GetWindowPlacement(hwnd)
+    if placement[0] == 2 and placement[1] == 3:
+        return True
+    return False
+
+
 def enum_displays(qtapp):
     displays = []
     screens = qtapp.screens()
@@ -76,23 +83,25 @@ def enum_displays(qtapp):
         display.update({'rectangle': rectangle})
 
         full_rect = scr.geometry().getRect()
+        full_rectangle = [full_rect[0], full_rect[1], full_rect[0]+rect[2], full_rect[1]+rect[3]]
+        display.update({'full_rectangle': full_rectangle})
         if full_rect[0] == 0 and full_rect[1] == 0:
-            display['primary'] = True
+            display.update({'primary': True})
 
         if scr.orientation() is QtCore.Qt.ScreenOrientation.PortraitOrientation:
-            display['orientation'] = 'portrait'
+            display.update({'orientation': 'portrait'})
 
         displays.append(display)
 
         logger.debug(f'display: {display}')
 
     # sort displays to list them from left to right
-    # (leftmost display has index 0)
+    # leftmost display has index 0
     displays = sorted(displays, key=itemgetter(['rectangle'][0]))
 
     hsh = get_hash(displays)
-    logger.debug(f'current screens layout: {displays}')
-    logger.debug(f'current screens layout hash: {hsh}')
+    logger.debug(f'current screen layout: {displays}')
+    logger.debug(f'current screen layout hash: {hsh}')
     return {'screens' : displays, 'hash' : hsh}
 
 

@@ -44,20 +44,38 @@ class Database:
         return rows
 
 
-    def search(self, dl_hash="", name="", title="", rect="", index=-1, orientation="", order_by=""):
+    def search(self, dl_hash=None, name=None, title=None, rect=None, index=None, orientation=None, order_by=None, logical_operator='AND'):
+        bindings = []
+        query_operator = 'WHERE'
+        query = "SELECT * FROM apps"
+        if dl_hash:
+            query += f'\n{query_operator} display_layout_hash=?'
+            query_operator = logical_operator
+            bindings.append(dl_hash)
+        if name:
+            query += f'\n{query_operator} process_name=?'
+            query_operator = logical_operator
+            bindings.append(name)
+        if title:
+            query += f'\n{query_operator} window_title=?'
+            query_operator = logical_operator
+            bindings.append(title)
+        if rect:
+            query += f'\n{query_operator} window_rectangle=?'
+            query_operator = logical_operator
+            bindings.append(rect)
+        if index:
+            query += f'\n{query_operator} display_index=?'
+            query_operator = logical_operator
+            bindings.append(index)
+        if orientation:
+            query += f'\n{query_operator} display_orientation=?'
+            query_operator = logical_operator
+            bindings.append(orientation)
+        if order_by:
+            query += f'\n ORDER BY {order_by}'
 
-        query = """SELECT * FROM apps
-                WHERE display_layout_hash=?
-                OR process_name=?
-                OR window_title=?
-                OR window_rectangle=?
-                OR display_index=?
-                OR display_orientation=?"""
-
-        if len(order_by) > 0:
-            query += f"\n ORDER BY {order_by}"
-
-        self.cur.execute(query, (dl_hash, name, title, rect, index, orientation))
+        self.cur.execute(query, bindings)
         rows = self.cur.fetchall()
         return rows
 

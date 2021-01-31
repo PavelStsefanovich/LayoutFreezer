@@ -1,7 +1,7 @@
 product_name: LayoutFreezer
 version: 0.2.0
 
-timestamp_format: "%Y-%m-%d_%H-%M-%S"
+timestamp_format: "%Y-%m-%d__%H-%M-%S"
 logger_config: "{root_dir}/logger.json"
 logs_dir: "{env_ALLUSERSPROFILE}/LayoutFreezer/logs"
 systray_icon: "{root_dir}/layoutfreezer.png"

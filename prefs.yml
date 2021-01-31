@@ -3,8 +3,13 @@
 # for example: "12, 179, 517, 311" will become "10, 180, 515, 310"
 snap_to_grid: True
 
-# when freezing layout, restore and include minimized windows
+# when freezing layout, bring up and include minimized windows
 restore_minimized: False
 
 # when freezing or restoring layout, adjust windows coordinates to fit into screen boundaries
 fit_into_screen: True
+
+# when freezing layout, only update those apps that dont have
+# their display config saved for current screen layout (process name + title)
+# otherwise: remove saved configs for affected apps before freezing
+freeze_new_only: True

@@ -12,12 +12,13 @@ logger = logging.getLogger(__name__)
 class Database:
 
     def __init__(self, db_path):
-
         # connect to database
         self.db_path = db_path
         self.conn = sqlite3.connect(db_path)
         self.cur = self.conn.cursor()
+        self.create()
 
+    def create(self):
         # create table 'apps' if does not exist
         self.cur.execute(
             """CREATE TABLE IF NOT EXISTS apps
@@ -83,8 +84,7 @@ class Database:
     def clear(self, table_name='apps'):
         self.cur.execute("DROP TABLE IF EXISTS apps")
         self.conn.commit()
-        self.conn.close()
-        self.__init__(self.db_path)
+        self.create()
 
     def __del__(self):
         self.conn.close()

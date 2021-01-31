@@ -138,6 +138,7 @@ def db_add_app_config(db, dl_hash, normalized_config):
 
 
 def db_delete_app_config(db, dl_hash, normalized_config):
+    logger.debug(f'deleting from database: {normalized_config}')
     db.delete(dl_hash=dl_hash, name=normalized_config[0], title=normalized_config[1])
 
 
@@ -156,6 +157,7 @@ def normalize_app_config(app_config):
 def app_config_already_saved(normalized_config, saved_app_configs):
     for app_config in saved_app_configs:
         if app_config[0:2] == normalized_config[0:2]:
+            logger.debug(f'found saved config: {normalized_config}')
             return True
     return False
 

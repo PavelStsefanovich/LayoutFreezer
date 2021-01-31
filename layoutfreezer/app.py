@@ -69,56 +69,43 @@ class SystemTrayApp():
     def freeze_layout(self):
         logger.info('USER COMMAND: "Freeze Layout"')
 
-        logger.info('Getting current screens layout')
+        logger.info('Getting current screen layout')
         display_layout = self.osscrn.enum_displays(self.app)
 
         logger.info('Looking for opened windows')
-        opened_windows = self.osscrn.enum_opened_windows(
-            display_layout['screens'], self.prefs)
+        opened_windows = self.osscrn.enum_opened_windows(display_layout['screens'], self.prefs)
 
-        # search database for saved app configurations for current screens layout
-        layout_app_configs = helpers.db_enum_apps_for_curr_screen_layout(
-            self.db, display_layout['hash'])
-        layout_apps = helpers.extract_process_names(layout_app_configs)
+        logger.info('Searching database for saved app position configurations for current screen layout')
+        saved_app_configs = helpers.db_enum_apps_for_curr_screen_layout(self.db, display_layout['hash'])
 
-        # add each app config to database
-        #(ps)logger.debug('Adding to database app configs for opened winows')
+        logger.info('Saving position configurations for opened apps into the database')
         for window in opened_windows:
-            simplified_app_config = helpers.simplify_app_config(opened_windows[window])
-            window_reference_log = f'\"{opened_windows[window]["window_title"]}\" ({opened_windows[window]["process_name"]})'
+            normalized_config = helpers.normalize_app_config(opened_windows[window])
+            window_reference = f'{normalized_config[0]} [{normalized_config[1]}]'
+            # skip if the same exact app config (process name + title) is already in database (based on preferences)
+            if saved_app_configs:
+                if helpers.app_config_already_saved(normalized_config, saved_app_configs):
+                    logger.debug(f'preference "freeze_new_only" is set to "{self.prefs["freeze_new_only"]}"')
+                    if self.prefs["freeze_new_only"]:
+                        logger.debug(f'skipped: "{window_reference}" (reason: already in database)')
+                        continue
+                    logger.debug(f'removing config for: "{window_reference}"')
+                    helpers.db_delete_app_config(self.db, display_layout['hash'], normalized_config)
+            # add unique and valid app config to database
+            logger.debug(f'adding config for: "{window_reference}"')
+            helpers.db_add_app_config(self.db, display_layout['hash'], normalized_config)
 
-    #         # skip if window is not visible or does not fit into active screens:
-    #         if opened_windows[window]["display_index"] < 0:
-    #             logger.debug(
-    #                 f'Skipping window {window_reference_log}')
-    #             logger.debug(
-    #                 '(reason: Window is not visible or out of displays boundaries')
-    #             continue
-
-    #         # skip if the same exact app config is already in database
-    #         if layout_app_configs:
-    #             #if simplified_app_config in layout_app_configs:
-    #             if opened_windows[window]['process_name'] in layout_apps:
-    #                 logger.debug(
-    #                     f'Skipping window {window_reference_log}')
-    #                 logger.debug(
-    #                     '(reason: already in database; use "Freeze Layout (replace)" to force-update)')
-    #                 continue
-
-    #         # add unique and valid config to database
-    #         db_add_app_config(
-    #             self.db, display_layout['hash'], simplified_app_config)
-
-        #TODO remove
-        # self.db.clear()
-        #print(self.db.list_all())
-        pass
 
     def open_preferences(self):
         # keyboard shortcuts
         # snap to the grid
 
         raise Exception('Not implemented')
+
+#TODO remove
+# self.db.clear()
+#print(self.db.list_all())
+# pass
 
 
 ##########  Functions  ############################

@@ -32,7 +32,6 @@ class Database:
             is_default BOOLEAN)""")
         self.conn.commit()
 
-
     def add(self, dl_hash=None, name=None, title=None, rect=None, index=None, orientation=None, is_default=0):
         self.cur.execute("INSERT OR REPLACE INTO apps VALUES (NULL, ?,?,?,?,?,?,?)",
                          (dl_hash, name, title, rect, index, orientation, is_default))
@@ -72,11 +71,9 @@ class Database:
         self.cur.execute(query, bindings)
         self.conn.commit()
 
-
     def list_all(self):
         rows = self.search()
         return rows
-
 
     def search(self, dl_hash=None, name=None, title=None, rect=None, index=None, orientation=None, order_by=None, logical_operator='AND'):
         bindings = []
@@ -111,7 +108,6 @@ class Database:
         self.cur.execute(query, bindings)
         rows = self.cur.fetchall()
         return rows
-
 
     def clear(self, table_name='apps'):
         self.cur.execute("DROP TABLE IF EXISTS apps")

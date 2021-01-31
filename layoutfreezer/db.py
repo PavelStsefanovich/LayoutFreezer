@@ -38,10 +38,43 @@ class Database:
                          (dl_hash, name, title, rect, index, orientation, is_default))
         self.conn.commit()
 
+    def delete(self, dl_hash=None, name=None, title=None, rect=None, index=None, orientation=None, logical_operator='AND'):
+        bindings = []
+        query_operator = 'WHERE'
+        query = "DELETE FROM apps"
+        if dl_hash:
+            query += f'\n{query_operator} display_layout_hash=?'
+            query_operator = logical_operator
+            bindings.append(dl_hash)
+        if name:
+            query += f'\n{query_operator} process_name=?'
+            query_operator = logical_operator
+            bindings.append(name)
+        if title:
+            query += f'\n{query_operator} window_title=?'
+            query_operator = logical_operator
+            bindings.append(title)
+        if rect:
+            query += f'\n{query_operator} window_rectangle=?'
+            query_operator = logical_operator
+            bindings.append(rect)
+        if index:
+            query += f'\n{query_operator} display_index=?'
+            query_operator = logical_operator
+            bindings.append(index)
+        if orientation:
+            query += f'\n{query_operator} display_orientation=?'
+            query_operator = logical_operator
+            bindings.append(orientation)
+        if query_operator == 'WHERE':
+            query += '\nWHERE display_layout_hash=?'
+            bindings.append('nothing')
+        self.cur.execute(query, bindings)
+        self.conn.commit()
+
 
     def list_all(self):
-        self.cur.execute("SELECT * FROM apps")
-        rows = self.cur.fetchall()
+        rows = self.search()
         return rows
 
 
@@ -75,7 +108,6 @@ class Database:
             bindings.append(orientation)
         if order_by:
             query += f'\n ORDER BY {order_by}'
-
         self.cur.execute(query, bindings)
         rows = self.cur.fetchall()
         return rows

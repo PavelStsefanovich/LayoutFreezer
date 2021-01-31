@@ -138,9 +138,7 @@ def db_add_app_config(db, dl_hash, normalized_config):
 
 
 def db_delete_app_config(db, dl_hash, normalized_config):
-    #TODO: implement
-    # saved_config = db.search(dl_hash=dl_hash
-    pass
+    db.delete(dl_hash=dl_hash, name=normalized_config[0], title=normalized_config[1])
 
 
 def normalize_app_config(app_config):

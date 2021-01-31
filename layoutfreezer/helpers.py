@@ -124,20 +124,20 @@ def db_enum_apps_for_curr_screen_layout(db, dl_hash, normalize=True):
     return results
 
 
-def db_add_app_config(db, dl_hash, normalized_app_config):
-    logger.debug(f'adding to database: {normalized_app_config}')
+def db_add_app_config(db, dl_hash, normalized_config):
+    logger.debug(f'adding to database: {normalized_config}')
     db.add(
         dl_hash,
-        normalized_app_config[0],
-        normalized_app_config[1],
-        normalized_app_config[2],
-        normalized_app_config[3],
-        normalized_app_config[4],
-        normalized_app_config[5]
+        normalized_config[0],
+        normalized_config[1],
+        normalized_config[2],
+        normalized_config[3],
+        normalized_config[4],
+        normalized_config[5]
     )
 
 
-def db_delete_app_config(db, dl_hash, normalized_app_config):
+def db_delete_app_config(db, dl_hash, normalized_config):
     #TODO: implement
     # saved_config = db.search(dl_hash=dl_hash
     pass
@@ -155,9 +155,11 @@ def normalize_app_config(app_config):
     return result
 
 
-def app_config_already_saved(normalized_app_config, saved_app_configs):
-    #TODO: implement
-    return True
+def app_config_already_saved(normalized_config, saved_app_configs):
+    for app_config in saved_app_configs:
+        if app_config[0:2] == normalized_config[0:2]:
+            return True
+    return False
 
 
 ##########  Main  #################################

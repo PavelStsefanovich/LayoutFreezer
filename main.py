@@ -39,8 +39,10 @@ def init():
     # setup logger
     try:
         helpers.setup_logger(
-            logger_config_path=main_config["logger_config"].replace('@root_dir@', main_config["root_dir"]),
-            start_time=main_config["start_time"]
+            logger_config_path=main_config["logger_config"],
+            logs_dir=main_config["logs_dir"],
+            start_time=main_config["start_time"],
+            timestamp_format=main_config["timestamp_format"]
         )
         global logger
         logger = logging.getLogger(__name__)

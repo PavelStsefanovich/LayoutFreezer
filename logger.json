@@ -19,7 +19,7 @@
       "class": "logging.handlers.RotatingFileHandler",
       "level": "DEBUG",
       "formatter": "simple",
-      "filename": "@env:ALLUSERSPROFILE@\\LayoutFreezer\\logs\\@timestamp@.log",
+      "filename": "@logs_dir@/@timestamp@.log",
       "maxBytes": 10485760,
       "backupCount": 20,
       "encoding": "utf8"

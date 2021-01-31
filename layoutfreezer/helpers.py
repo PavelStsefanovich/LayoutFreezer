@@ -27,6 +27,7 @@ def get_root_dir():
 
 def setup_logger(
         logger_config_path="logger.json",
+        logs_dir="logs",
         start_time=datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         timestamp_format="%Y-%m-%d_%H-%M-%S"):
 
@@ -40,20 +41,12 @@ def setup_logger(
     # resolve logfiles paths, create directories
     for handler in logger_config["handlers"]:
         try:
-            # replace timestamp placeholder
+            # replace placeholders
+            logger_config["handlers"][handler]["filename"] = logger_config["handlers"][handler]["filename"].replace(
+                "@logs_dir@", logs_dir)
             logger_config["handlers"][handler]["filename"] = logger_config["handlers"][handler]["filename"].replace(
                 "@timestamp@", timestamp)
-
-            # replace env var placeholder
-            env_var = re.match(
-                '^@env\:([^@]+)@', logger_config["handlers"][handler]["filename"])
-            if isinstance(env_var, re.Match):
-                logger_config["handlers"][handler]["filename"] = logger_config["handlers"][handler]["filename"].replace(
-                    env_var.group(0), os.environ[env_var.group(1)], 1)
-
-            logdir = os.path.split(os.path.abspath(
-                logger_config["handlers"][handler]["filename"]))[0]
-            os.makedirs(logdir, exist_ok=True)
+            os.makedirs(logs_dir, exist_ok=True)
         except:
             pass
 

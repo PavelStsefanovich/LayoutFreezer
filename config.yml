@@ -3,7 +3,8 @@ version: 0.2.0
 
 timestamp_format: "%Y-%m-%d_%H-%M-%S"
 logger_config: "{root_dir}/logger.json"
+logs_dir: "{env_ALLUSERSPROFILE}/LayoutFreezer/logs"
 systray_icon: "{root_dir}/layoutfreezer.png"
-database_path: "~/.layoutfreezer/database"
-preferences_path: "~/.layoutfreezer/prefs.yml"
-preferences_default: "prefs.yml"
+database_path: "{env_APPDATA}/LayoutFreezer/database"
+preferences_path: "{env_APPDATA}/LayoutFreezer/prefs.yml"
+preferences_default: "{root_dir}/prefs.yml"

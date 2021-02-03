@@ -1,9 +1,9 @@
 from layoutfreezer import helpers
 from layoutfreezer.db import Database
 import logging
-from PySide2 import QtGui
-from PySide2 import QtWidgets
 from os import path, makedirs
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QApplication, QMenu, QMessageBox, QSystemTrayIcon, QWidget
 import sys
 import traceback
 
@@ -15,56 +15,58 @@ logger = logging.getLogger(__name__)
 
 ##########  Classes  ##############################
 
-class SystemTrayApp():
+class SystemTrayApp(QSystemTrayIcon):
 
-    def __init__(self, iconpath, tooltip='SystemTrayApp', database_path='database', osscrn=None, prefs=None):
-        self.osscrn = osscrn
+    def __init__(self, config, prefs, osscrn, app):
+        super().__init__()
+        self.config = config
         self.prefs = prefs
+        self.osscrn = osscrn
+        self.app = app
+        self.widget = QWidget()
 
-        # Initiate database connection
-        database_path = path.abspath(database_path)
+        # Initialize database connection
+        database_path = path.abspath(self.config["database_path"])
         logger.debug(f'database path: {database_path}')
         makedirs(path.split(database_path)[0], exist_ok=True)
         self.db = Database(database_path)
 
-        # Init QApplication, QWidet and QMenu
-        self.app = QtWidgets.QApplication([])
-        self.widget = QtWidgets.QWidget()
-        self.menu = QtWidgets.QMenu(self.widget)
-
-        # Add items to menu
-        self.menu_action_raise = self.menu.addAction("Freeze Layout")
-        self.menu_action_raise.triggered.connect(self.freeze_layout)
-
-        self.menu_action_raise = self.menu.addAction("Restore Layout")
-        self.menu_action_raise.triggered.connect(self.restore_layout)
-
-        self.menu_action_raise = self.menu.addSeparator()
-
-        self.menu_action_raise = self.menu.addAction("Preferences")
-        self.menu_action_raise.triggered.connect(self.open_preferences)
-
-        self.menu_action_raise = self.menu.addSeparator()
-
-        self.menu_action_exit = self.menu.addAction("Exit")
-        self.menu_action_exit.triggered.connect(self.app.exit)
-
-        # Create app icon
-        iconpath = path.abspath(iconpath)
+        # System tray icon
+        iconpath = path.abspath(self.config["systray_icon"])
         logger.debug(f'systemTray icon path: {iconpath}')
-        self.icon = QtGui.QIcon(iconpath)
+        self.setIcon(QIcon(iconpath))
 
-        # Create the tray app
-        self.tray = QtWidgets.QSystemTrayIcon(self.icon, self.widget)
-        self.tray.setContextMenu(self.menu)
-        self.tray.setToolTip(tooltip)
-        self.tray.showMessage('one', 'two', QtGui.QIcon(iconpath))
+        # System tray tooltip
+        self.setToolTip(
+            f'{self.config["product_name"]} {self.config["version"]}')
+
+        # System tray menu
+        stmenu = QMenu()
+
+        action_freeze = stmenu.addAction("Freeze Layout")
+        action_freeze.triggered.connect(self.freeze_layout)
+
+        action_restore = stmenu.addAction("Restore Layout")
+        action_restore.triggered.connect(self.restore_layout)
+
+        stmenu.addSeparator()
+
+        action_prefs = stmenu.addAction("Preferences")
+        action_prefs.triggered.connect(self.open_preferences)
+
+        action_clear_db = stmenu.addAction("Clear Database")
+        action_clear_db.triggered.connect(self.clear_database)
+
+        stmenu.addSeparator()
+
+        action_exit = stmenu.addAction("Exit")
+        action_exit.triggered.connect(self.app.exit)
+
+        self.setContextMenu(stmenu)
 
         # Show app
-        self.tray.show()
+        self.show()
 
-    def restore_layout(self):
-        raise Exception('Not implemented')
 
     def freeze_layout(self):
         logger.info('USER COMMAND: "Freeze Layout"')
@@ -95,17 +97,38 @@ class SystemTrayApp():
             logger.debug(f'adding config for: "{window_reference}"')
             helpers.db_add_app_config(self.db, display_layout['hash'], normalized_config)
 
+        logger.info('Finished processing command "Freeze Layout"')
 
-    def open_preferences(self):
-        # keyboard shortcuts
-        # snap to the grid
 
+    def restore_layout(self):
         raise Exception('Not implemented')
 
-#TODO remove
-# self.db.clear()
-#print(self.db.list_all())
-# pass
+
+    def open_preferences(self):
+        raise Exception('Not implemented')
+
+
+    def clear_database(self):
+        logger.info('USER COMMAND: "Clear Database"')
+
+        logger.debug('asking user for confirmation')
+        reply = QMessageBox.warning(
+            self.widget,
+            self.config["product_name"],
+            "You are about to delete all saved layouts from the database.",
+            QMessageBox.Ok | QMessageBox.Abort,
+            QMessageBox.Abort
+        )
+
+        if reply == QMessageBox.Ok:
+            logger.debug('user clicked "OK"')
+            logger.debug('dropping database')
+            self.db.clear()
+        elif reply == QMessageBox.Abort:
+            logger.debug('user clicked "Abort"')
+            logger.debug('operation cancelled')
+
+        logger.info('Finished processing command "Clear Database"')
 
 
 ##########  Functions  ############################
@@ -115,23 +138,12 @@ def excepthook(exc_type, exc_value, exc_tb):
     logger.error(trace)
 
 
-def load_preferences(preferences_path, preferences_default):
-    preferences_path = path.abspath(preferences_path)
-    preferences_default = path.abspath(preferences_default)
-    logger.debug(f'preferences file path: {preferences_path}')
-    makedirs(path.split(preferences_path)[0], exist_ok=True)
-    try:
-        prefs = helpers.load_config_yml(preferences_path)
-    except Exception as e:
-        logger.debug(e)
-        logger.debug(f'copying default preferences from file "{preferences_default}"')
-        helpers.copyfile(preferences_default, preferences_path)
-        prefs = helpers.load_config_yml(preferences_path)
-    return prefs
-
-
 def run(main_config):
     sys.excepthook = excepthook
+
+    logger.info('Loading preferences')
+    prefs = helpers.load_preferences(
+        main_config["preferences_path"], main_config["preferences_default"])
 
     logger.info("Gathering system info")
     main_config.update({'system': helpers.get_system_info()})
@@ -146,26 +158,16 @@ def run(main_config):
     if main_config["system"]["os"] == 'Mac':
         import layoutfreezer.os_screen.mac as osscrn
 
-    logger.info('Loading preferences')
-    prefs = load_preferences(
-        main_config["preferences_path"], main_config["preferences_default"])
-
     logger.info("Initializing systray app")
-    trayapp = SystemTrayApp(
-        iconpath=main_config["systray_icon"],
-        tooltip=f'{main_config["product_name"]} {main_config["version"]}',
-        database_path=main_config["database_path"],
-        osscrn=osscrn,
-        prefs=prefs
-    )
+    application = QApplication(sys.argv)
+    application.setQuitOnLastWindowClosed(False)
+    trayapp = SystemTrayApp(config=main_config, prefs=prefs, osscrn=osscrn, app=application)
+    trayapp.showMessage(f'{main_config["product_name"]} has started',
+                             'Use system tray icon for info and options', trayapp.icon())
 
-    trayapp.tray.showMessage(f'{main_config["product_name"]} has started',
-                             'Use system tray icon for info and options', trayapp.icon)
-
-    process = trayapp.app.exec_()
+    application.exec_()
     logger.info('Stopping application')
-    sys.exit(process)
-
+    sys.exit()
 
 
 ##########  Main  #################################

@@ -1,9 +1,5 @@
-from .db import Database
-import json
 import logging
-from PySide2 import QtGui
-from PySide2 import QtWidgets
-from os import path, makedirs
+from PySide2.QtWidgets import QApplication, QMessageBox
 import sys
 
 
@@ -14,15 +10,13 @@ logger = logging.getLogger(__name__)
 
 ##########  Functions  ############################
 
-def show_critical_error_dialog(
-    errormessage="Critical error occured (no details provided)"):
-
-    app = QtWidgets.QApplication(sys.argv)
-    msgBox = QtWidgets.QMessageBox()
-    msgBox.setIcon(QtWidgets.QMessageBox.Critical)
+def show_critical_error_dialog(errormessage="Critical error occured (no details provided)"):
+    app = QApplication(sys.argv)
+    msgBox = QMessageBox()
+    msgBox.setIcon(QMessageBox.Critical)
     msgBox.setText(errormessage)
     msgBox.show()
-    sys.exit(app.exec_())
+    app.exec_()
 
 
 ##########  Main  #################################

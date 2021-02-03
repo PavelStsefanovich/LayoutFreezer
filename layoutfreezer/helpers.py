@@ -1,9 +1,9 @@
 from datetime import datetime
-from .gui import show_critical_error_dialog
+from layoutfreezer import gui
 import json
 import logging
 import logging.config
-import os
+from os import path, makedirs, environ
 import platform
 import re
 from shutil import copyfile
@@ -20,9 +20,9 @@ logger = logging.getLogger(__name__)
 
 def get_root_dir():
     if getattr(sys, "frozen", False):
-        return os.path.realpath(os.path.dirname(sys.executable))
+        return path.realpath(path.dirname(sys.executable))
     elif __file__:
-        return os.path.realpath(sys.path[0])
+        return path.realpath(sys.path[0])
 
 
 def setup_logger(
@@ -34,7 +34,7 @@ def setup_logger(
     timestamp = start_time.strftime(timestamp_format)
 
     # load logger config
-    logger_config_path = os.path.abspath(logger_config_path)
+    logger_config_path = path.abspath(logger_config_path)
     with open(logger_config_path, "rt") as file:
         logger_config = json.load(file)
 
@@ -46,7 +46,7 @@ def setup_logger(
                 "@logs_dir@", logs_dir)
             logger_config["handlers"][handler]["filename"] = logger_config["handlers"][handler]["filename"].replace(
                 "@timestamp@", timestamp)
-            os.makedirs(logs_dir, exist_ok=True)
+            makedirs(logs_dir, exist_ok=True)
         except:
             pass
 
@@ -64,9 +64,25 @@ def load_config_yml(config_file_path, log=True):
     return config
 
 
+def load_preferences(preferences_path, preferences_default):
+    preferences_path = path.abspath(preferences_path)
+    preferences_default = path.abspath(preferences_default)
+    logger.debug(f'preferences file path: {preferences_path}')
+    makedirs(path.split(preferences_path)[0], exist_ok=True)
+    try:
+        prefs = load_config_yml(preferences_path)
+    except Exception as e:
+        logger.debug(e)
+        logger.debug(
+            f'copying default preferences from file "{preferences_default}"')
+        copyfile(preferences_default, preferences_path)
+        prefs = load_config_yml(preferences_path)
+    return prefs
+
+
 def errpopup(errormessage=None, level=None):
     if level == 'critical':
-        show_critical_error_dialog(errormessage=errormessage)
+        gui.show_critical_error_dialog(errormessage=errormessage)
 
 
 def dict_expand_vars(dic1=None, dic2=None):
@@ -82,14 +98,14 @@ def dict_expand_vars(dic1=None, dic2=None):
         if isinstance(dic1[el], str):
             if re.match(r'^\~[\\\/]', dic[el]):
                 dic[el] = re.sub(
-                    r'^\~(?=[\\\/])', os.path.expanduser('~').replace('\\', '/'), dic[el])
+                    r'^\~(?=[\\\/])', path.expanduser('~').replace('\\', '/'), dic[el])
             el_placeholders = re.findall(r'\{\w+\}', dic[el])
             for placeholder in el_placeholders:
                 env_var = re.match(r'^env_(\w+)', placeholder.strip('{}'))
                 if env_var:
-                    if env_var[1] in os.environ:
+                    if env_var[1] in environ:
                         dic[el] = dic[el].replace(
-                            placeholder, os.environ[env_var[1]])
+                            placeholder, environ[env_var[1]])
                     continue
                 placeholder_value = dic2.get(placeholder.strip('{}'))
                 if isinstance(placeholder_value, str):

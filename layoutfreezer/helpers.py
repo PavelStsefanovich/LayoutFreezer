@@ -64,9 +64,9 @@ def load_config_yml(config_file_path, log=True):
     return config
 
 
-def load_preferences(preferences_path, preferences_default):
+def load_preferences(preferences_path, preferences_default_path):
     preferences_path = path.abspath(preferences_path)
-    preferences_default = path.abspath(preferences_default)
+    preferences_default_path = path.abspath(preferences_default_path)
     logger.debug(f'preferences file path: {preferences_path}')
     makedirs(path.split(preferences_path)[0], exist_ok=True)
     try:
@@ -74,8 +74,8 @@ def load_preferences(preferences_path, preferences_default):
     except Exception as e:
         logger.debug(e)
         logger.debug(
-            f'copying default preferences from file "{preferences_default}"')
-        copyfile(preferences_default, preferences_path)
+            f'copying default preferences from file "{preferences_default_path}"')
+        copyfile(preferences_default_path, preferences_path)
         prefs = load_config_yml(preferences_path)
     return prefs
 

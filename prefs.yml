@@ -1,10 +1,10 @@
+# when freezing layout, bring up and include minimized windows
+restore_minimized: False
+
 # when freezing layout, round each window coordinates to the nearest 0 or 5
 # this makes it easier to line up windows evenly
 # for example: "12, 179, 517, 311" will become "10, 180, 515, 310"
 snap_to_grid: True
-
-# when freezing layout, bring up and include minimized windows
-restore_minimized: False
 
 # when freezing or restoring layout, adjust windows coordinates to fit into screen boundaries
 fit_into_screen: True
@@ -13,3 +13,16 @@ fit_into_screen: True
 # their display config saved for current screen layout (process name + title)
 # otherwise: remove saved configs for affected apps before freezing
 freeze_new_only: True
+
+# when restoring layout, if saved configs are found for a process, 
+# but not exactly same title found in any of those configs,
+# then attempt is made to find the closest matching title using difflib.get_close_matches().
+# use this parameter to control the lowest allowed measure of the similarity.
+# (the higher the value, the more similar titles will be included into comparison)
+# (allowed range: float 0-1)
+match_cutoff: 0.6
+
+
+key_shortcuts:
+  freeze: something
+  restore: something

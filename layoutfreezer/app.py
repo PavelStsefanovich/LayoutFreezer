@@ -18,13 +18,17 @@ logger = logging.getLogger(__name__)
 
 class SystemTrayApp(QSystemTrayIcon):
 
-    def __init__(self, config, prefs, osscrn, app):
+    def __init__(self, config, osscrn, app):
         super().__init__()
         self.config = config
-        self.prefs = prefs
         self.osscrn = osscrn
         self.app = app
         self.widget = QWidget()
+
+        # Loading preferences
+        logger.info('Loading preferences')
+        self.prefs = helpers.load_preferences(
+            self.config["preferences_path"], self.config["preferences_default_path"])
 
         # Initialize database connection
         database_path = path.abspath(self.config["database_path"])
@@ -75,6 +79,10 @@ class SystemTrayApp(QSystemTrayIcon):
         logger.info('Getting current screen layout')
         display_layout = self.osscrn.enum_displays(self.app)
 
+        logger.info('Reloading preferences')
+        self.prefs = helpers.load_preferences(
+            self.config["preferences_path"], self.config["preferences_default_path"])
+
         logger.info('Looking for opened windows')
         opened_windows = self.osscrn.enum_opened_windows(
             display_layout['screens'], self.prefs)
@@ -107,10 +115,13 @@ class SystemTrayApp(QSystemTrayIcon):
 
     def restore_layout(self):
         logger.info('USER COMMAND: "Restore Layout"')
-        #raise Exception('Not implemented'
 
         logger.info('Getting current screen layout')
         display_layout = self.osscrn.enum_displays(self.app)
+
+        logger.info('Reloading preferences')
+        self.prefs = helpers.load_preferences(
+            self.config["preferences_path"], self.config["preferences_default_path"])
 
         logger.info('Looking for opened windows')
         prefs = self.prefs.copy()
@@ -179,10 +190,6 @@ def excepthook(exc_type, exc_value, exc_tb):
 def run(main_config):
     sys.excepthook = excepthook
 
-    logger.info('Loading preferences')
-    prefs = helpers.load_preferences(
-        main_config["preferences_path"], main_config["preferences_default"])
-
     logger.info("Gathering system info")
     main_config.update({'system': helpers.get_system_info()})
 
@@ -199,7 +206,7 @@ def run(main_config):
     logger.info("Initializing systray app")
     application = QApplication(sys.argv)
     application.setQuitOnLastWindowClosed(False)
-    trayapp = SystemTrayApp(config=main_config, prefs=prefs, osscrn=osscrn, app=application)
+    trayapp = SystemTrayApp(config=main_config, osscrn=osscrn, app=application)
     trayapp.showMessage(f'{main_config["product_name"]} has started',
                              'Use system tray icon for info and options', trayapp.icon())
 

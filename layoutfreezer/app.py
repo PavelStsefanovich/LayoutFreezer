@@ -1,3 +1,4 @@
+from layoutfreezer.ai import adjust_window_rectangle
 from layoutfreezer import helpers
 from layoutfreezer.db import Database
 import logging
@@ -75,18 +76,22 @@ class SystemTrayApp(QSystemTrayIcon):
         display_layout = self.osscrn.enum_displays(self.app)
 
         logger.info('Looking for opened windows')
-        opened_windows = self.osscrn.enum_opened_windows(display_layout['screens'], self.prefs)
+        opened_windows = self.osscrn.enum_opened_windows(
+            display_layout['screens'], self.prefs)
 
         logger.info('Searching database for saved app position configurations for current screen layout')
-        saved_app_configs = helpers.db_enum_apps_for_curr_screen_layout(self.db, display_layout['hash'])
+        saved_app_configs = helpers.db_enum_apps_for_curr_screen_layout(
+            self.db, display_layout['hash'])
 
         logger.info('Saving position configurations for opened apps into the database')
         for window in opened_windows:
             normalized_config = helpers.normalize_app_config(opened_windows[window])
             window_reference = f'{normalized_config[0]} [{normalized_config[1]}]'
-            # skip if the same exact app config (process name + title) is already in database (based on preferences)
+            # skip if the same exact app config (process name + title) is already in database
+            # (based on 'freeze_new_only' preference)
             if saved_app_configs:
-                if helpers.app_config_already_saved(normalized_config, saved_app_configs):
+                matches = helpers.get_config_matches(normalized_config, saved_app_configs)
+                if matches and not isinstance(matches, dict):
                     logger.debug(f'preference "freeze_new_only" is set to "{self.prefs["freeze_new_only"]}"')
                     if self.prefs["freeze_new_only"]:
                         logger.debug(f'skipped: "{window_reference}" (reason: already in database)')
@@ -101,10 +106,43 @@ class SystemTrayApp(QSystemTrayIcon):
 
 
     def restore_layout(self):
-        raise Exception('Not implemented')
+        logger.info('USER COMMAND: "Restore Layout"')
+        #raise Exception('Not implemented'
 
+        logger.info('Getting current screen layout')
+        display_layout = self.osscrn.enum_displays(self.app)
+
+        logger.info('Looking for opened windows')
+        prefs = self.prefs.copy()
+        prefs["snap_to_grid"] = False
+        prefs["fit_into_screen"] = False
+        opened_windows = self.osscrn.enum_opened_windows(
+            display_layout['screens'], prefs)
+
+        logger.info('Searching database for saved app position configurations for current screen layout')
+        saved_app_configs = helpers.db_enum_apps_for_curr_screen_layout(
+            self.db, display_layout['hash'])
+
+        logger.info('Restoring position configurations for opened apps')
+        for window in opened_windows:
+            normalized_config = helpers.normalize_app_config(opened_windows[window])
+            window_reference = f'{normalized_config[0]} [{normalized_config[1]}]'
+
+            logger.debug(f'adjusting position config for: {window_reference}')
+            adjusted_window_rectangle = adjust_window_rectangle(
+                normalized_config,
+                saved_app_configs,
+                display_layout,
+                self.osscrn,
+                self.prefs)
+
+            logger.debug(f'restoring window position: {window_reference}')
+            self.osscrn.move_window(window, adjusted_window_rectangle)
+
+        logger.info('Finished processing command "Restore Layout"')
 
     def open_preferences(self):
+        logger.info('USER COMMAND: "Preferences"')
         raise Exception('Not implemented')
 
 

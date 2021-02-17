@@ -170,12 +170,22 @@ def normalize_app_config(app_config):
     return result
 
 
-def app_config_already_saved(normalized_config, saved_app_configs):
+def get_config_matches(normalized_config, saved_app_configs):
+    logger.debug(f'looking for saved config matches for: "{normalized_config}"')
+    partial_matches = []
     for app_config in saved_app_configs:
         if app_config[0:2] == normalized_config[0:2]:
-            logger.debug(f'found saved config: {normalized_config}')
-            return True
-    return False
+            logger.debug(f'found full match: {app_config}')
+            return app_config
+        elif app_config[0] == normalized_config[0]:
+            logger.debug(f'found partial match: {app_config}')
+            partial_matches.append(app_config)
+
+    if partial_matches:
+        return {'partial_matches' : partial_matches}
+
+    logger.debug('no matches found')
+    return None
 
 
 ##########  Main  #################################

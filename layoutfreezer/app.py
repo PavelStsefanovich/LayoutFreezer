@@ -156,6 +156,7 @@ class SystemTrayApp(QSystemTrayIcon):
 
         logger.info('Finished processing command "Restore Layout"')
 
+
     def open_preferences(self):
         logger.info('USER COMMAND: "Preferences"')
         raise Exception('Not implemented')

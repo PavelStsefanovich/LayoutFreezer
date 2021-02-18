@@ -9,7 +9,7 @@ import sys
 
 main_config = {}
 main_config["start_time"] = datetime.now()
-main_config["root_dir"] = helpers.get_root_dir()
+main_config["install_dir"] = helpers.get_root_dir()
 
 
 ##################   Functions  ###################
@@ -18,7 +18,7 @@ def init():
     # load config from file config.yml
     global main_config
     main_config_filepath = path.realpath(
-        path.join(main_config["root_dir"], "config.yml"))
+        path.join(main_config["install_dir"], "config.yml"))
     errormessage = f'LayoutFreezer failed to start.\n'
 
     try:

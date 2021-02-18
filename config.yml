@@ -2,9 +2,9 @@ product_name: LayoutFreezer
 version: 0.2.0
 
 timestamp_format: "%Y-%m-%d__%H-%M-%S"
-logger_config: "{root_dir}/logger.json"
+logger_config: "{install_dir}/logger.json"
 logs_dir: "{env_ALLUSERSPROFILE}/LayoutFreezer/logs"
-systray_icon: "{root_dir}/layoutfreezer.png"
+systray_icon: "{install_dir}/layoutfreezer.png"
 database_path: "{env_APPDATA}/LayoutFreezer/database"
 preferences_path: "{env_APPDATA}/LayoutFreezer/prefs.yml"
-preferences_default_path: "{root_dir}/prefs.yml"
+preferences_default_path: "{install_dir}/prefs.yml"

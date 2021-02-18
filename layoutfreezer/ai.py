@@ -29,9 +29,11 @@ def get_closest_match(normalized_config, matches, cutoff):
     closest_match_title = get_close_matches(
         curr_title, compare_titles, n=1, cutoff=cutoff)
     if closest_match_title:
+        logger.debug(f'most closely matching title: {closest_match_title[0]}')
         for m in matches:
             if m[1] == closest_match_title[0]:
                 return m
+    logger.debug('no closely matching titles found')
     return normalized_config
 
 

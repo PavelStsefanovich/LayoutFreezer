@@ -119,7 +119,7 @@ def callback(hwnd, callback_param):
             if style & wcon.WS_VISIBLE:
                 include = True
                 if wgui.IsIconic(hwnd):
-                    if callback_param["prefs"]["restore_minimized"]:
+                    if callback_param["prefs"]["restore_minimized"]["value"]:
                         wgui.ShowWindow(hwnd, 9)
                     else:
                         include = False
@@ -149,10 +149,10 @@ def callback(hwnd, callback_param):
                             callback_param['windows_dict'][hwnd].update({'display_primary': display_primary})
 
                             move = False
-                            if callback_param["prefs"]["snap_to_grid"]:
+                            if callback_param["prefs"]["snap_to_grid"]["value"]:
                                 rect = adjust_rect_to_grid(rect)
                                 move = True
-                            if callback_param["prefs"]["fit_into_screen"]:
+                            if callback_param["prefs"]["fit_into_screen"]["value"]:
                                 rect = fit_rect_into_screen(rect, callback_param["screens"][display_index]['rectangle'])
                                 move = True
                             if move:

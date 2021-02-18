@@ -55,8 +55,8 @@ def adjust_window_rectangle(
             # partial matches
             closest_match = get_closest_match(
                 normalized_config,
-                matches['partial_matches'],
-                prefs['match_cutoff']
+                matches["partial_matches"],
+                prefs["match_cutoff"]["value"]
             )
             adjusted_rect = convert_rectangle_to_int(closest_match[2])
         else:
@@ -67,9 +67,9 @@ def adjust_window_rectangle(
         adjusted_rect = convert_rectangle_to_int(normalized_config[2])
 
     # fit adjusted_rect into screen and grid
-    if prefs["snap_to_grid"]:
+    if prefs["snap_to_grid"]["value"]:
         adjusted_rect = osscrn.adjust_rect_to_grid(adjusted_rect)
-    if prefs["fit_into_screen"]:
+    if prefs["fit_into_screen"]["value"]:
         display_index = osscrn.get_display_index(display_layout['screens'], adjusted_rect)
         adjusted_rect = osscrn.fit_rect_into_screen(
             adjusted_rect, display_layout['screens'][display_index]['rectangle'])

@@ -100,8 +100,8 @@ class SystemTrayApp(QSystemTrayIcon):
             if saved_app_configs:
                 matches = helpers.get_config_matches(normalized_config, saved_app_configs)
                 if matches and not isinstance(matches, dict):
-                    logger.debug(f'preference "freeze_new_only" is set to "{self.prefs["freeze_new_only"]}"')
-                    if self.prefs["freeze_new_only"]:
+                    logger.debug(f'preference "freeze_new_only" is set to "{self.prefs["freeze_new_only"]["value"]}"')
+                    if self.prefs["freeze_new_only"]["value"]:
                         logger.debug(f'skipped: "{window_reference}" (reason: already in database)')
                         continue
                     logger.debug(f'removing config for: "{window_reference}"')
@@ -124,9 +124,13 @@ class SystemTrayApp(QSystemTrayIcon):
             self.config["preferences_path"], self.config["preferences_default_path"])
 
         logger.info('Looking for opened windows')
-        prefs = self.prefs.copy()
-        prefs["snap_to_grid"] = False
-        prefs["fit_into_screen"] = False
+        # workaround for this statement not working as expected:
+        # prefs = self.prefs.copy()
+        prefs = {}
+        for el in self.prefs:
+            prefs[el] = self.prefs[el].copy()
+        prefs["snap_to_grid"]["value"] = False
+        prefs["fit_into_screen"]["value"] = False
         opened_windows = self.osscrn.enum_opened_windows(
             display_layout['screens'], prefs)
 

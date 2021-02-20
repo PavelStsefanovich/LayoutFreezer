@@ -71,6 +71,7 @@ class SystemTrayApp(QSystemTrayIcon):
         self.setContextMenu(stmenu)
 
         # Show app
+        logger.info("App is up!")
         self.show()
 
 
@@ -162,13 +163,13 @@ class SystemTrayApp(QSystemTrayIcon):
         logger.info('USER COMMAND: "Preferences"')
 
         #TODO temporary implementation using notepad
-        logger.debug('opening preferences file in notepad.exe')
         commandline = f'notepad "{self.config["preferences_path"]}"'
+        logger.debug(f'running command: \'{commandline}\'')
         process = subprocess.run(commandline)
         if process.returncode != 0:
             raise Exception(process)
 
-        logger.info('Finished processing command "Restore Layout"')
+        logger.info('Finished processing command "Preferences"')
 
 
     def clear_database(self):

@@ -5,6 +5,7 @@ import logging
 from os import path, makedirs
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication, QMenu, QMessageBox, QSystemTrayIcon, QWidget
+import subprocess
 import sys
 import traceback
 
@@ -159,7 +160,15 @@ class SystemTrayApp(QSystemTrayIcon):
 
     def open_preferences(self):
         logger.info('USER COMMAND: "Preferences"')
-        raise Exception('Not implemented')
+
+        #TODO temporary implementation using notepad
+        logger.debug('opening preferences file in notepad.exe')
+        commandline = f'notepad "{self.config["preferences_path"]}"'
+        process = subprocess.run(commandline)
+        if process.returncode != 0:
+            raise Exception(process)
+
+        logger.info('Finished processing command "Restore Layout"')
 
 
     def clear_database(self):

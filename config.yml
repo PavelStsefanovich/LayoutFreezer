@@ -3,8 +3,37 @@ version: 0.2.0
 
 timestamp_format: "%Y-%m-%d__%H-%M-%S"
 logger_config: "{install_dir}/logger.json"
-logs_dir: "{env_ALLUSERSPROFILE}/LayoutFreezer/logs"
+logs_dir: "{install_dir}/logs"
 systray_icon: "{install_dir}/layoutfreezer.png"
-database_path: "{env_APPDATA}/LayoutFreezer/database"
-preferences_path: "{env_APPDATA}/LayoutFreezer/prefs.yml"
+database_path: "~/.layoutfreezer/database"
+preferences_path: "~/.layoutfreezer/prefs.yml"
 preferences_default_path: "{install_dir}/prefs.yml"
+
+
+#-----------------------------------------------------------------
+
+# Values accept environment variables references:
+# e.g. {env_APPDATA} will expand to APPDATA env. variable.
+# Warning: env. variables are OS-specific
+
+# Values accept references to the keys in the same file,
+# e.g. {logs_dir} will expand to the value of 'logs_dir' key
+
+# Paths values accept user home directory shortcut: '~'
+
+# RESERVED KEYS:
+#  'start_time'
+#  'install_dir'
+# These keys are used by the main program,
+# and will be overwritten on the app launch.
+
+#-----------------------------------------------------------------
+
+# EXAMPLE (Windows-only):
+# timestamp_format: "%Y-%m-%d__%H-%M-%S"
+# logger_config: "{install_dir}/logger.json"
+# logs_dir: "{env_ALLUSERSPROFILE}/LayoutFreezer/logs"
+# systray_icon: "{install_dir}/layoutfreezer.png"
+# database_path: "{env_APPDATA}/LayoutFreezer/database"
+# preferences_path: "{env_APPDATA}/LayoutFreezer/prefs.yml"
+# preferences_default_path: "{install_dir}/prefs.yml"

@@ -9,9 +9,6 @@ downloads/
 *.dll
 *.zip
 notes.*txt
-misc/
-*_.py
-*test*.py
 
 #(ps)(!) TEMPORARY
 prefs_.yml

@@ -4,12 +4,18 @@ $current_location = $PWD.Path
 cd $PSScriptRoot
 
 try {
-    gi dist -ErrorAction SilentlyContinue | rm -Force -recurse
+    # clean
+    gi dist,*.zip -ErrorAction SilentlyContinue | rm -Force -recurse
+    # build
     & pipenv install
     & pipenv run pyinstaller -F -i layoutfreezer.ico -n LayoutFreezer --windowed main.py
-    # cp params.yml dist
-    # cp config dist -recurse
-    # rm dist/config/*.ico    
+    # package
+    mkdir .\dist\LayoutFreezer | Out-Null
+    foreach ($file in @('dist\LayoutFreezer.exe', 'config.yml', 'prefs.yml', 'layoutfreezer.png', 'logger.json', 'README.md')) {
+        (gi $file).FullName | % { cp $_ .\dist\LayoutFreezer -Force }
+    }
+    Add-Type -AssemblyName "system.io.compression.filesystem"
+    [io.compression.zipfile]::CreateFromDirectory('.\dist\LayoutFreezer', 'LayoutFreezer.zip', "Optimal", $true)
 }
 catch {
     throw $_

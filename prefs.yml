@@ -29,6 +29,7 @@ match_cutoff:
     Use this parameter to control similarity treshold (allowed range: float 0.0-1.0)
     (the higher the value, the more titles should match to be included into comparison).'
 
+# key shortcuts are currently not implemented
 key_shortcuts:
-  freeze: something
-  restore: something
+  freeze: Ctrl+Alt+F
+  restore: Ctrl+Alt+R

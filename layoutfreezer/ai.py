@@ -33,8 +33,9 @@ def get_closest_match(normalized_config, matches, cutoff):
         for m in matches:
             if m[1] == closest_match_title[0]:
                 return m
-    logger.debug('no closely matching titles found')
-    return normalized_config
+    logger.debug(
+        f'no closely matching titles found; using first config in the list for given process: {matches[0]}')
+    return matches[0]
 
 
 def convert_rectangle_to_int(str_rect):

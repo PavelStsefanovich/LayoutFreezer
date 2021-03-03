@@ -11,9 +11,13 @@ A user can then reposition/resize windows for opened applications in one click t
 
 ---
 ### Roadmap:
+- Multiple options for Freeze layout (only new or not)
+- Multiple options for Clear Database (entire db or just current display layout)
 - Guess best location for an opened app that has config(s) saved for current display layout with non-matching title(s)
 - Guess best location for an opened app that has config saved for other display layout(s), but not for current one.
-- Preferences edit dialog
+- Preferences edit dialog or in-menu checklist
 - Key shortcuts
 - Install/Uninstall scripts
 - About dialog with version info, home url, log/database/preferences/config location.
+- Implement handling of windows for app running with elevated privileges (currently unable to enumerate: access denied)
+- Add known invisible system apps to exclude list

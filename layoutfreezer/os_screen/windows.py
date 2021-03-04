@@ -2,7 +2,7 @@ import hashlib
 import logging
 from operator import itemgetter
 import os
-from PySide2 import QtCore
+from PySide6 import QtCore
 import sys
 import win32api as wapi
 import win32con as wcon

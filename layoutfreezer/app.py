@@ -3,8 +3,19 @@ from layoutfreezer import helpers
 from layoutfreezer.db import Database
 import logging
 from os import path, makedirs
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QApplication, QMenu, QMessageBox, QSystemTrayIcon, QWidget
+from pynput import keyboard
+from PySide6 import QtCore
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (
+    QApplication,
+    QCheckBox,
+    QDialog,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QSystemTrayIcon,
+    QVBoxLayout,
+    QWidget)
 import subprocess
 import sys
 import traceback
@@ -222,6 +233,7 @@ def run(main_config):
     application = QApplication(sys.argv)
     application.setQuitOnLastWindowClosed(False)
     trayapp = SystemTrayApp(config=main_config, osscrn=osscrn, app=application)
+    #TODO: App label in notifications should be LayoutFreezer, not Python
     trayapp.showMessage(f'{main_config["product_name"]} has started',
                              'Use system tray icon for info and options', trayapp.icon())
 

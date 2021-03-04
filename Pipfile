@@ -11,8 +11,9 @@ rope = "*"
 [packages]
 pyinstaller = "*"
 pypiwin32 = "*"
-pyside2 = "*"
+pyside6 = "*"
 pyyaml = "*"
+pynput = "*"
 
 [requires]
 python_version = "3.7"

@@ -13,13 +13,6 @@ fit_into_screen:
   value: True
   description: 'When freezing or restoring layout, adjust windows coordinates to fit into screen boundaries'
 
-freeze_new_only:
-  value: True
-  description: |
-    'When freezing layout, only update those apps that dont have
-    their display config saved for current screen layout (process name + title).
-    Otherwise: replace saved configs for affected apps'
-
 match_cutoff:
   value: 0.6
   description: |
@@ -29,7 +22,22 @@ match_cutoff:
     Use this parameter to control similarity treshold (allowed range: float 0.0-1.0)
     (the higher the value, the more titles should match to be included into comparison).'
 
-# key shortcuts are currently not implemented
-key_shortcuts:
-  freeze: Ctrl+Alt+F
-  restore: Ctrl+Alt+R
+enable_hotkeys:
+  value: True
+  description: |
+    'Disable hotkeys listener to avoid collisions with other apps
+    (alternatively, change keys combination for conflicting operations).
+    Enabled by default.'
+
+hotkeys:
+  value:
+    freeze_all      : '<ctrl>+<alt>+<shift>+f'
+    freeze_new      : '<ctrl>+<alt>+f'
+    restore         : '<ctrl>+<alt>+r'
+  description: |
+    'Supported key combinations:
+     - Ctrl + Alt + letter/digit
+     - Ctrl + Alt + Shift + letter/digit
+    Supported format:
+    <control_key>+<control_key>+letter/digit
+    (e.g. "<ctrl>+<alt>+f")'

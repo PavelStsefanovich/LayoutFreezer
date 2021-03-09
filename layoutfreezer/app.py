@@ -5,10 +5,11 @@ import logging
 from os import path, makedirs
 from pynput import keyboard
 #TODO remove
-#from PySide6 import QtCore
-from PySide6.QtCore import Signal, Slot
-from PySide6.QtGui import QIcon, QAction, QKeySequence
-from PySide6.QtWidgets import (
+#from PySide2 import QtCore
+from PySide2.QtCore import Signal, Slot
+from PySide2.QtGui import QIcon, QKeySequence
+from PySide2.QtWidgets import (
+    QAction,
     QApplication,
     QCheckBox,
     QDialog,

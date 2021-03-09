@@ -4,11 +4,25 @@ $current_location = $PWD.Path
 cd $PSScriptRoot
 
 try {
-    # clean
+    # init
     gi dist, *.zip, LayoutFreezer.exe  -ErrorAction SilentlyContinue | rm -Force -recurse
-    # build
+    if (!(gcm pipenv -ErrorAction SilentlyContinue)) { & pip install pipenv }
     & pipenv install
-    & pipenv run pyinstaller -F -i icons\layoutfreezer.ico -n LayoutFreezer --windowed main.py
+
+    # build
+    $pyinstaller_cmd = "pipenv run pyinstaller"
+    $pyinstaller_cmd += " -F -i icons\layoutfreezer.ico -n LayoutFreezer"
+    $pyinstaller_cmd += " --hidden-import `"pynput.keyboard._win32`""
+    $pyinstaller_cmd += " --hidden-import `"pynput.mouse._win32`""
+    $pyinstaller_cmd += " --windowed"
+    $pyinstaller_cmd += " main.py"
+    iex $pyinstaller_cmd
+
+    <#
+    debug options:
+      --debug=imports (must not be used together with "--windowed")
+    #>
+
     # package
     $major_version = '0.0.0'
     foreach ($line in (cat .\config.yml)) {

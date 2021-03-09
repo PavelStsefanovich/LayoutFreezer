@@ -1,5 +1,5 @@
 import logging
-from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide2.QtWidgets import QApplication, QMessageBox
 import sys
 
 

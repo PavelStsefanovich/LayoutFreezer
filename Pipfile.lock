@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cd49cd745a3b7ed944dd28bb0f35aa6e350662f475ac1852a6b426b3d05ce4ff"
+            "sha256": "8559478cdc58fa63e2f1e55e54aeec7ee13f08b1eb3619bf7abd561b914065ad"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -27,7 +27,7 @@
             "hashes": [
                 "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"
             ],
-            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2'",
             "version": "==0.18.2"
         },
         "importlib-metadata": {
@@ -163,7 +163,7 @@
                 "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259",
                 "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
             "version": "==1.15.0"
         },
         "typing-extensions": {
@@ -192,14 +192,6 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==2.5.1"
-        },
-        "autopep8": {
-            "hashes": [
-                "sha256:9e136c472c475f4ee4978b51a88a494bfcd4e3ed17950a44a988d9e434837bea",
-                "sha256:cae4bc0fb616408191af41d062d7ec7ef8679c7f27b068875ca3a9e2878d5443"
-            ],
-            "index": "pypi",
-            "version": "==1.5.5"
         },
         "colorama": {
             "hashes": [
@@ -254,14 +246,6 @@
             ],
             "version": "==0.6.1"
         },
-        "pycodestyle": {
-            "hashes": [
-                "sha256:2295e7b2f6b5bd100585ebcb1f616591b652db8a741695b3d8f5d28bdc934367",
-                "sha256:c58a7d2815e0e8d7972bf1803331fb0152f867bd89adf8a01dfd55085434192e"
-            ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==2.6.0"
-        },
         "pylint": {
             "hashes": [
                 "sha256:0e21d3b80b96740909d77206d741aa3ce0b06b41be375d92e1f3244a274c1f8a",
@@ -282,7 +266,7 @@
                 "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b",
                 "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"
             ],
-            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2'",
             "version": "==0.10.2"
         },
         "typed-ast": {
@@ -318,7 +302,7 @@
                 "sha256:d746a437cdbca200622385305aedd9aef68e8a645e385cc483bdc5e488f07166",
                 "sha256:e683e409e5c45d5c9082dc1daf13f6374300806240719f95dc783d1fc942af10"
             ],
-            "markers": "python_version < '3.8' and implementation_name == 'cpython'",
+            "markers": "implementation_name == 'cpython' and python_version < '3.8'",
             "version": "==1.4.2"
         },
         "wrapt": {

@@ -1,11 +1,10 @@
 from layoutfreezer.ai import adjust_window_rectangle
+from layoutfreezer.gui import About
 from layoutfreezer import helpers
 from layoutfreezer.db import Database
 import logging
 from os import path, makedirs
 from pynput import keyboard
-#TODO remove
-#from PySide2 import QtCore
 from PySide2.QtCore import Signal, Slot
 from PySide2.QtGui import QIcon, QKeySequence
 from PySide2.QtWidgets import (
@@ -48,7 +47,7 @@ class SystemTrayApp(QSystemTrayIcon):
         self.freeze_new.connect(self.run_freeze_new)
         self.restore.connect(self.run_restore)
 
-        # Loading preferences
+        # Load preferences
         logger.info('Loading preferences')
         self.prefs = self.load_preferences()
 
@@ -115,6 +114,9 @@ class SystemTrayApp(QSystemTrayIcon):
 
         action_clear_db = stmenu.addAction("Clear Database")
         action_clear_db.triggered.connect(self.clear_database)
+
+        action_prefs = stmenu.addAction("About")
+        action_prefs.triggered.connect(self.open_about)
 
         stmenu.addSeparator()
 
@@ -268,6 +270,9 @@ class SystemTrayApp(QSystemTrayIcon):
         process = subprocess.run(commandline)
         if process.returncode != 0:
             raise Exception(process)
+        # prefs_dialog = Prefs(self.prefs)
+        # prefs_dialog.show()
+        # prefs_dialog.exec_()
 
         self.prefs = self.load_preferences()
         self.set_hotkeys_listener()
@@ -297,6 +302,15 @@ class SystemTrayApp(QSystemTrayIcon):
             logger.debug('operation cancelled')
 
         logger.info('Finished processing command "Clear Database"')
+
+
+    def open_about(self):
+        logger.info('USER COMMAND: "About"')
+        about = About(self.config)
+        about.show()
+        about.exec_()
+        logger.info('Finished processing command "About"')
+
 
 
 ##########  Functions  ############################

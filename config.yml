@@ -1,5 +1,6 @@
 product_name: LayoutFreezer
 version: 0.4.0
+home_page: https://github.com/PavelStsefanovich/LayoutFreezer
 
 timestamp_format: "%Y-%m-%d__%H-%M-%S"
 logger_config: "{install_dir}/logger.json"

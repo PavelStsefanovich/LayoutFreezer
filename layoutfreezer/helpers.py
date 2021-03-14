@@ -54,14 +54,21 @@ def setup_logger(
     logging.config.dictConfig(logger_config)
 
 
-def load_config_yml(config_file_path, log=True):
+def load_yaml(yaml_file_path, log=True):
     if log:
-        logger.debug(f'reading YAML file "{config_file_path}"')
-    with open(config_file_path, "rt") as file:
+        logger.debug(f'reading YAML file "{yaml_file_path}"')
+    with open(yaml_file_path, "rt") as file:
         config = yaml.safe_load(file)
     if log:
         logger.debug(f'loaded YAML config: "{config}"')
     return config
+
+
+def dump_yaml(data, yaml_file_path, log=True):
+    if log:
+        logger.debug(f'writing into YAML file "{yaml_file_path}"')
+    with open(yaml_file_path, "w") as file:
+        yaml.safe_dump(data, file, default_style='|')
 
 
 def errpopup(errormessage=None, level=None):

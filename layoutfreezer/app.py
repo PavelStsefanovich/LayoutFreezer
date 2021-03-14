@@ -134,13 +134,13 @@ class SystemTrayApp(QSystemTrayIcon):
         logger.debug(f'preferences file path: {preferences_path}')
         makedirs(path.split(preferences_path)[0], exist_ok=True)
         try:
-            prefs = helpers.load_config_yml(preferences_path)
+            prefs = helpers.load_yaml(preferences_path)
         except Exception as e:
             logger.debug(e)
             logger.debug(
                 f'copying default preferences from file "{preferences_default_path}"')
             helpers.copyfile(preferences_default_path, preferences_path)
-            prefs = helpers.load_config_yml(preferences_path)
+            prefs = helpers.load_yaml(preferences_path)
         return prefs
 
 

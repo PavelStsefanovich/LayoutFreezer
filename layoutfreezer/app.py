@@ -1,5 +1,5 @@
 from layoutfreezer.ai import adjust_window_rectangle
-from layoutfreezer.gui import About
+from layoutfreezer.gui import About, Preferences
 from layoutfreezer import helpers
 from layoutfreezer.db import Database
 import logging
@@ -43,6 +43,8 @@ class SystemTrayApp(QSystemTrayIcon):
         self.osscrn = osscrn
         self.app = app
         self.widget = QWidget()
+        self.about_dialog = None
+        self.prefs_dialog = None
         self.freeze_all.connect(self.run_freeze_all)
         self.freeze_new.connect(self.run_freeze_new)
         self.restore.connect(self.run_restore)
@@ -142,6 +144,13 @@ class SystemTrayApp(QSystemTrayIcon):
             helpers.copyfile(preferences_default_path, preferences_path)
             prefs = helpers.load_yaml(preferences_path)
         return prefs
+
+
+    def save_preferences(self):
+        logger.debug('saving preferences')
+        preferences_path = path.abspath(
+            self.config["preferences_path"])
+        helpers.dump_yaml(self.prefs, preferences_path)
 
 
     @Slot()
@@ -262,23 +271,22 @@ class SystemTrayApp(QSystemTrayIcon):
 
 
     def open_preferences(self):
-        logger.info('USER COMMAND: "Preferences"')
-
-        #TODO temporary implementation using notepad
-        commandline = f'notepad "{self.config["preferences_path"]}"'
-        logger.debug(f'running command: \'{commandline}\'')
-        process = subprocess.run(commandline)
-        if process.returncode != 0:
-            raise Exception(process)
-        # prefs_dialog = Prefs(self.prefs)
-        # prefs_dialog.show()
-        # prefs_dialog.exec_()
-
-        self.prefs = self.load_preferences()
-        self.set_hotkeys_listener()
-        self.set_context_menu()
-
-        logger.info('Finished processing command "Preferences"')
+        if self.prefs_dialog:
+            logger.debug('user re-issued command: "Preferences" while dialog is open')
+            self.prefs_dialog.show()
+            self.prefs_dialog.raise_()
+            self.prefs_dialog.activateWindow()
+        else:
+            logger.info('USER COMMAND: "Preferences"')
+            self.prefs_dialog = Preferences(self.prefs)
+            self.prefs_dialog.show()
+            self.prefs_dialog.exec_()
+            self.prefs = self.prefs_dialog.prefs
+            self.prefs_dialog = None
+            self.save_preferences()
+            self.set_hotkeys_listener()
+            self.set_context_menu()
+            logger.info('Finished processing command "Preferences"')
 
 
     def clear_database(self):
@@ -305,11 +313,18 @@ class SystemTrayApp(QSystemTrayIcon):
 
 
     def open_about(self):
-        logger.info('USER COMMAND: "About"')
-        about = About(self.config)
-        about.show()
-        about.exec_()
-        logger.info('Finished processing command "About"')
+        if self.about_dialog:
+            logger.debug('user re-issued command: "About" while dialog is open')
+            self.about_dialog.show()
+            self.about_dialog.raise_()
+            self.about_dialog.activateWindow()
+        else:
+            logger.info('USER COMMAND: "About"')
+            self.about_dialog = About(self.config)
+            self.about_dialog.show()
+            self.about_dialog.exec_()
+            self.about_dialog = None
+            logger.info('Finished processing command "About"')
 
 
 

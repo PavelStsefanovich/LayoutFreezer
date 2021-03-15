@@ -65,12 +65,15 @@ class SystemTrayApp(QSystemTrayIcon):
         if not path.isfile(app_iconpath):
             raise FileNotFoundError(f'App icon file not found: {app_iconpath}')
         self.setIcon(self.favicon)
-        self.freeze_iconpath = path.abspath(self.config["freeze_icon"])
-        if not path.isfile(self.freeze_iconpath):
-            raise FileNotFoundError(f'Menu icon file not found: {self.freeze_iconpath}')
-        self.restore_iconpath = path.abspath(self.config["restore_icon"])
-        if not path.isfile(self.restore_iconpath):
-            raise FileNotFoundError(f'Menu icon file not found: {self.restore_iconpath}')
+
+        freeze_iconpath = path.abspath(self.config["freeze_icon"])
+        self.freeze_icon = QIcon(freeze_iconpath)
+
+        restore_iconpath = path.abspath(self.config["restore_icon"])
+        self.restore_icon = QIcon(restore_iconpath)
+
+        caution_iconpath = path.abspath(self.config["caution_icon"])
+        self.caution_icon = QIcon(caution_iconpath)
 
         # System tray tooltip
         self.setToolTip(
@@ -90,8 +93,7 @@ class SystemTrayApp(QSystemTrayIcon):
     def set_context_menu(self):
         stmenu = QMenu()
 
-        action_freeze_new = QAction(
-            QIcon(self.freeze_iconpath), "Freeze New", self)
+        action_freeze_new = QAction(self.freeze_icon, "Freeze New", self)
         action_freeze_new.setShortcut(QKeySequence(
             self.prefs["hotkeys"]["value"]["freeze_new"].replace('<', '').replace('>', '')))
         action_freeze_new.triggered.connect(self.freeze_layout)
@@ -103,8 +105,7 @@ class SystemTrayApp(QSystemTrayIcon):
         action_freeze_all.triggered.connect(self.freeze_layout_all)
         stmenu.addAction(action_freeze_all)
 
-        action_restore = QAction(
-            QIcon(self.restore_iconpath), "Restore Layout", self)
+        action_restore = QAction(self.restore_icon, "Restore Layout", self)
         action_restore.setShortcut(QKeySequence(
             self.prefs["hotkeys"]["value"]["restore"].replace('<', '').replace('>', '')))
         action_restore.triggered.connect(self.restore_layout)
@@ -112,11 +113,19 @@ class SystemTrayApp(QSystemTrayIcon):
 
         stmenu.addSeparator()
 
+        clear_db_submenu = QMenu("Clear Database", stmenu)
+
+        action_clear_db_curr_display_layout = clear_db_submenu.addAction("Current Display Layout")
+        action_clear_db_curr_display_layout.triggered.connect(self.clear_database_curr_display_layout)
+
+        action_clear_db_all = QAction(self.caution_icon, "Clear Everything", self)
+        action_clear_db_all.triggered.connect(self.clear_database_all)
+        clear_db_submenu.addAction(action_clear_db_all)
+
+        stmenu.addMenu(clear_db_submenu)
+
         action_prefs = stmenu.addAction("Preferences")
         action_prefs.triggered.connect(self.open_preferences)
-
-        action_clear_db = stmenu.addAction("Clear Database")
-        action_clear_db.triggered.connect(self.clear_database)
 
         action_prefs = stmenu.addAction("About")
         action_prefs.triggered.connect(self.open_about)
@@ -290,8 +299,13 @@ class SystemTrayApp(QSystemTrayIcon):
             logger.info('Finished processing command "Preferences"')
 
 
-    def clear_database(self):
-        logger.info('USER COMMAND: "Clear Database"')
+    def clear_database_curr_display_layout(self):
+        logger.info('USER COMMAND: "Clear Current Display Layout"')
+        logger.info('Finished processing command "Clear Current Display Layout"')
+
+
+    def clear_database_all(self):
+        logger.info('USER COMMAND: "Clear Everything"')
 
         logger.debug('asking user for confirmation')
         reply = QMessageBox.warning(
@@ -310,7 +324,7 @@ class SystemTrayApp(QSystemTrayIcon):
             logger.debug('user clicked "Abort"')
             logger.debug('operation cancelled')
 
-        logger.info('Finished processing command "Clear Database"')
+        logger.info('Finished processing command "Clear Everything"')
 
 
     def open_about(self):
@@ -326,7 +340,6 @@ class SystemTrayApp(QSystemTrayIcon):
             self.about_dialog.exec_()
             self.about_dialog = None
             logger.info('Finished processing command "About"')
-
 
 
 ##########  Functions  ############################

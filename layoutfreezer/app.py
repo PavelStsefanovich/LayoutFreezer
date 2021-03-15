@@ -1,5 +1,5 @@
 from layoutfreezer.ai import adjust_window_rectangle
-from layoutfreezer.gui import About, Preferences
+from layoutfreezer.gui import About, Preferences, Confirmation
 from layoutfreezer import helpers
 from layoutfreezer.db import Database
 import logging
@@ -10,13 +10,9 @@ from PySide2.QtGui import QIcon, QKeySequence
 from PySide2.QtWidgets import (
     QAction,
     QApplication,
-    QCheckBox,
-    QDialog,
     QMenu,
     QMessageBox,
-    QPushButton,
     QSystemTrayIcon,
-    QVBoxLayout,
     QWidget)
 import subprocess
 import sys
@@ -42,9 +38,9 @@ class SystemTrayApp(QSystemTrayIcon):
         self.config = config
         self.osscrn = osscrn
         self.app = app
-        self.widget = QWidget()
         self.about_dialog = None
         self.prefs_dialog = None
+        self.confirmation = None
         self.freeze_all.connect(self.run_freeze_all)
         self.freeze_new.connect(self.run_freeze_new)
         self.restore.connect(self.run_restore)
@@ -308,26 +304,24 @@ class SystemTrayApp(QSystemTrayIcon):
 
 
     def clear_database_all(self):
-        logger.info('USER COMMAND: "Clear Everything"')
+        if self.confirmation:
+            logger.debug('user re-issued command: "Clear Everything" while dialog is open')
+            #TODO issue: ui-001
+        else:
+            logger.info('USER COMMAND: "Clear Everything"')
+            self.confirmation = Confirmation(self.favicon)
+            user_reply = self.confirmation.warning_proceed(
+                title=self.config["product_name"],
+                message="You are about to delete all saved layouts from the database."
+            )
 
-        logger.debug('asking user for confirmation')
-        reply = QMessageBox.warning(
-            self.widget,
-            self.config["product_name"],
-            "You are about to delete all saved layouts from the database.",
-            QMessageBox.Ok | QMessageBox.Abort,
-            QMessageBox.Abort
-        )
+            if user_reply:
+                logger.debug('dropping database')
+                self.db.clear()
+            else:
+                logger.debug('operation cancelled')
 
-        if reply == QMessageBox.Ok:
-            logger.debug('user clicked "OK"')
-            logger.debug('dropping database')
-            self.db.clear()
-        elif reply == QMessageBox.Abort:
-            logger.debug('user clicked "Abort"')
-            logger.debug('operation cancelled')
-
-        logger.info('Finished processing command "Clear Everything"')
+            logger.info('Finished processing command "Clear Everything"')
 
 
     def open_about(self):

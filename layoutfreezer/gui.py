@@ -12,7 +12,8 @@ from PySide2.QtWidgets import (
     QMessageBox,
     QPushButton,
     QTextBrowser,
-    QVBoxLayout)
+    QVBoxLayout,
+    QWidget)
 import re
 import sys
 
@@ -365,6 +366,35 @@ class Preferences(QDialog):
             self.hotkey_restore.setText(self.prefs["hotkeys"]["value"]["restore"])
             self.hotkey_restore_status.setText('Failed to update: unsupported format')
             self.hotkey_restore_status.setStyleSheet("color: red;")
+
+
+class Confirmation(QMessageBox):
+
+    def __init__(self, icon=None):
+        super().__init__()
+        self.widget = QWidget()
+        if icon:
+            self.widget.setWindowIcon(icon)
+
+
+    def warning_proceed(self, title="No title", message="Are you sure?"):
+        logger.debug('asking user for confirmation to proceed')
+        reply = self.warning(
+            self.widget,
+            title,
+            message,
+            self.Ok | self.Abort,
+            self.Abort
+        )
+
+        if reply == self.Ok:
+            logger.debug('user clicked "OK"')
+            return True
+        elif reply == self.Abort:
+            logger.debug('user clicked "Abort"')
+            return False
+        else:
+            raise Exception("Unrecognized user response")
 
 
 ##########  Functions  ############################

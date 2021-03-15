@@ -15,10 +15,12 @@ After starting LF for the first time, a user will need to position opened window
 A user can then reposition/resize windows for opened applications in one click to match saved coordinates for each opened app for current display configuration. Matching applications are determined by process name and title. If title does not match exactly, the config with most similar title will be selected. If no similar titles are found, LF will attempt to guess the most suitable position configuration considering all saved configs for current app. Nothing will happen for opened windows that don't have at least a single configuration saved into the database.
 
 ## Roadmap:
-- Multiple options for Clear Database (entire db or just current display layout)
+- > Multiple options for Clear Database (entire db or just current display layout)
 - Install/Uninstall scripts
 - Guess best location for an opened app that has config(s) saved for current display layout with non-matching title(s)
 - Guess best location for an opened app that has config saved for other display layout(s), but not for current one.
+- Rework "Clear Everything" confirmation dialog to avoid it's being open in background (issue: ui-001)
+- Cosmetic: in Preferences dialog make parameters names bold (groupbox title)
 ###### Tentative:
 - ? Preferences validation in case user edited it manually
 - ? Implement handling of windows for app running with elevated privileges (currently unable to enumerate: access denied)

@@ -1,43 +1,35 @@
 restore_minimized:
   value: False
-  description: When freezing layout, bring up and include minimized windows
+  description: When freezing layout, bring up and include minimized windows.
 
 snap_to_grid:
   value: True
   description: |
     When freezing layout, round each window coordinates to the nearest 0 or 5.
     This makes it easier to line up windows evenly.
-    Example: "12, 179, 517, 311" will become "10, 180, 515, 310"
 
 fit_into_screen:
   value: True
-  description: When freezing or restoring layout, adjust windows coordinates to fit into screen boundaries
+  description: When freezing or restoring layout, adjust windows coordinates to fit into screen boundaries.
 
 match_cutoff:
   value: 0.6
   description: |
-    When restoring layout, if saved configs are found for a process
-    but titles do not match exactly the title of the app that is being restored,
-    then attempt is made to find the closest matching title using difflib.get_close_matches().
-    Use this parameter to control similarity treshold (allowed range: float 0.0-1.0)
-    (the higher the value, the more titles should match to be included into comparison).
+    When restoring layout, if saved configs are found for a process but titles do not match the current window title exactly, then closest matching title will be selected.
+    This parameter controls similarity treshold in a range of 0.1-1.0 (the higher the value, the more precisely titles need to match to be included into comparison).
+    Titles with similarity value less then this treshold will not be considered.
 
 enable_hotkeys:
   value: True
-  description: |
-    Disable hotkeys listener to avoid collisions with other apps
-    (alternatively, change keys combination for conflicting operations).
-    Enabled by default.
+  description: Enable global hotkeys listener (uncheck in case of collisions with other apps; alternatively, change keys combination below for conflicting operations).
 
 hotkeys:
   value:
-    freeze_all      : <ctrl>+<alt>+<shift>+f
     freeze_new      : <ctrl>+<alt>+f
+    freeze_all      : <ctrl>+<alt>+<shift>+f
     restore         : <ctrl>+<alt>+r
   description: |
     Supported key combinations:
      - Ctrl + Alt + letter/digit
      - Ctrl + Alt + Shift + letter/digit
-    Supported format:
-    <control_key>+<control_key>+letter/digit
-    (e.g. "<ctrl>+<alt>+f")
+    Supported format: <ctrl>+<alt>[+<shift>]+x

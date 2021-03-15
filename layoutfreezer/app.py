@@ -1,10 +1,23 @@
 from layoutfreezer.ai import adjust_window_rectangle
+from layoutfreezer.gui import About, Preferences
 from layoutfreezer import helpers
 from layoutfreezer.db import Database
 import logging
 from os import path, makedirs
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QApplication, QMenu, QMessageBox, QSystemTrayIcon, QWidget
+from pynput import keyboard
+from PySide2.QtCore import Signal, Slot
+from PySide2.QtGui import QIcon, QKeySequence
+from PySide2.QtWidgets import (
+    QAction,
+    QApplication,
+    QCheckBox,
+    QDialog,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QSystemTrayIcon,
+    QVBoxLayout,
+    QWidget)
 import subprocess
 import sys
 import traceback
@@ -13,11 +26,16 @@ import traceback
 ##########  Global Properties  ####################
 
 logger = logging.getLogger(__name__)
+listener = None
 
 
 ##########  Classes  ##############################
 
 class SystemTrayApp(QSystemTrayIcon):
+
+    freeze_all = Signal()
+    freeze_new = Signal()
+    restore = Signal()
 
     def __init__(self, config, osscrn, app):
         super().__init__()
@@ -25,11 +43,15 @@ class SystemTrayApp(QSystemTrayIcon):
         self.osscrn = osscrn
         self.app = app
         self.widget = QWidget()
+        self.about_dialog = None
+        self.prefs_dialog = None
+        self.freeze_all.connect(self.run_freeze_all)
+        self.freeze_new.connect(self.run_freeze_new)
+        self.restore.connect(self.run_restore)
 
-        # Loading preferences
+        # Load preferences
         logger.info('Loading preferences')
-        self.prefs = helpers.load_preferences(
-            self.config["preferences_path"], self.config["preferences_default_path"])
+        self.prefs = self.load_preferences()
 
         # Initialize database connection
         database_path = path.abspath(self.config["database_path"])
@@ -37,23 +59,56 @@ class SystemTrayApp(QSystemTrayIcon):
         makedirs(path.split(database_path)[0], exist_ok=True)
         self.db = Database(database_path)
 
-        # System tray icon
-        iconpath = path.abspath(self.config["systray_icon"])
-        logger.debug(f'systemTray icon path: {iconpath}')
-        self.setIcon(QIcon(iconpath))
+        # Icons
+        app_iconpath = path.abspath(self.config["systray_icon"])
+        self.favicon = QIcon(app_iconpath)
+        if not path.isfile(app_iconpath):
+            raise FileNotFoundError(f'App icon file not found: {app_iconpath}')
+        self.setIcon(self.favicon)
+        self.freeze_iconpath = path.abspath(self.config["freeze_icon"])
+        if not path.isfile(self.freeze_iconpath):
+            raise FileNotFoundError(f'Menu icon file not found: {self.freeze_iconpath}')
+        self.restore_iconpath = path.abspath(self.config["restore_icon"])
+        if not path.isfile(self.restore_iconpath):
+            raise FileNotFoundError(f'Menu icon file not found: {self.restore_iconpath}')
 
         # System tray tooltip
         self.setToolTip(
             f'{self.config["product_name"]} {self.config["version"]}')
 
         # System tray menu
+        self.set_context_menu()
+
+        # hotkey listener
+        self.set_hotkeys_listener()
+
+        # Show app
+        logger.info("App is up!")
+        self.show()
+
+
+    def set_context_menu(self):
         stmenu = QMenu()
 
-        action_freeze = stmenu.addAction("Freeze Layout")
-        action_freeze.triggered.connect(self.freeze_layout)
+        action_freeze_new = QAction(
+            QIcon(self.freeze_iconpath), "Freeze New", self)
+        action_freeze_new.setShortcut(QKeySequence(
+            self.prefs["hotkeys"]["value"]["freeze_new"].replace('<', '').replace('>', '')))
+        action_freeze_new.triggered.connect(self.freeze_layout)
+        stmenu.addAction(action_freeze_new)
 
-        action_restore = stmenu.addAction("Restore Layout")
+        action_freeze_all = QAction("Freeze All", self)
+        action_freeze_all.setShortcut(QKeySequence(
+            self.prefs["hotkeys"]["value"]["freeze_all"].replace('<', '').replace('>', '')))
+        action_freeze_all.triggered.connect(self.freeze_layout_all)
+        stmenu.addAction(action_freeze_all)
+
+        action_restore = QAction(
+            QIcon(self.restore_iconpath), "Restore Layout", self)
+        action_restore.setShortcut(QKeySequence(
+            self.prefs["hotkeys"]["value"]["restore"].replace('<', '').replace('>', '')))
         action_restore.triggered.connect(self.restore_layout)
+        stmenu.addAction(action_restore)
 
         stmenu.addSeparator()
 
@@ -63,6 +118,9 @@ class SystemTrayApp(QSystemTrayIcon):
         action_clear_db = stmenu.addAction("Clear Database")
         action_clear_db.triggered.connect(self.clear_database)
 
+        action_prefs = stmenu.addAction("About")
+        action_prefs.triggered.connect(self.open_about)
+
         stmenu.addSeparator()
 
         action_exit = stmenu.addAction("Exit")
@@ -70,20 +128,79 @@ class SystemTrayApp(QSystemTrayIcon):
 
         self.setContextMenu(stmenu)
 
-        # Show app
-        logger.info("App is up!")
-        self.show()
+
+    def load_preferences(self):
+        preferences_path = path.abspath(
+            self.config["preferences_path"])
+        preferences_default_path = path.abspath(
+            self.config["preferences_default_path"])
+        logger.debug(f'preferences file path: {preferences_path}')
+        makedirs(path.split(preferences_path)[0], exist_ok=True)
+        try:
+            prefs = helpers.load_yaml(preferences_path)
+        except Exception as e:
+            logger.debug(e)
+            logger.debug(
+                f'copying default preferences from file "{preferences_default_path}"')
+            helpers.copyfile(preferences_default_path, preferences_path)
+            prefs = helpers.load_yaml(preferences_path)
+        return prefs
 
 
-    def freeze_layout(self):
-        logger.info('USER COMMAND: "Freeze Layout"')
+    def save_preferences(self):
+        logger.debug('saving preferences')
+        preferences_path = path.abspath(
+            self.config["preferences_path"])
+        helpers.dump_yaml(self.prefs, preferences_path)
+
+
+    @Slot()
+    def run_freeze_all(self):
+        logger.debug(f'hotkeys detected: {self.prefs["hotkeys"]["value"]["freeze_all"]}')
+        self.freeze_layout_all()
+
+
+    @Slot()
+    def run_freeze_new(self):
+        logger.debug(f'hotkeys detected: {self.prefs["hotkeys"]["value"]["freeze_new"]}')
+        self.freeze_layout()
+
+
+    @Slot()
+    def run_restore(self):
+        logger.debug(f'hotkeys detected: {self.prefs["hotkeys"]["value"]["restore"]}')
+        self.restore_layout()
+
+
+    def set_hotkeys_listener(self):
+        global listener
+        try:
+            listener.stop()
+        except:
+            pass
+        if self.prefs["enable_hotkeys"]["value"]:
+            listener = keyboard.GlobalHotKeys({
+                self.prefs['hotkeys']['value']['freeze_all']      : self.freeze_all.emit,
+                self.prefs['hotkeys']['value']['freeze_new'] : self.freeze_new.emit,
+                self.prefs['hotkeys']['value']['restore']         : self.restore.emit})
+            listener.start()
+
+
+    def freeze_layout_all(self):
+        self.freeze_layout(all=True)
+
+
+    def freeze_layout(self, all=False):
+        if all:
+            logger.info('USER COMMAND: "Freeze All"')
+        else:
+            logger.info('USER COMMAND: "Freeze New"')
 
         logger.info('Getting current screen layout')
         display_layout = self.osscrn.enum_displays(self.app)
 
         logger.info('Reloading preferences')
-        self.prefs = helpers.load_preferences(
-            self.config["preferences_path"], self.config["preferences_default_path"])
+        self.prefs = self.load_preferences()
 
         logger.info('Looking for opened windows')
         opened_windows = self.osscrn.enum_opened_windows(
@@ -97,13 +214,10 @@ class SystemTrayApp(QSystemTrayIcon):
         for window in opened_windows:
             normalized_config = helpers.normalize_app_config(opened_windows[window])
             window_reference = f'{normalized_config[0]} [{normalized_config[1]}]'
-            # skip if the same exact app config (process name + title) is already in database
-            # (based on 'freeze_new_only' preference)
             if saved_app_configs:
                 matches = helpers.get_config_matches(normalized_config, saved_app_configs)
                 if matches and not isinstance(matches, dict):
-                    logger.debug(f'preference "freeze_new_only" is set to "{self.prefs["freeze_new_only"]["value"]}"')
-                    if self.prefs["freeze_new_only"]["value"]:
+                    if not all:
                         logger.debug(f'skipped: "{window_reference}" (reason: already in database)')
                         continue
                     logger.debug(f'removing config for: "{window_reference}"')
@@ -122,12 +236,10 @@ class SystemTrayApp(QSystemTrayIcon):
         display_layout = self.osscrn.enum_displays(self.app)
 
         logger.info('Reloading preferences')
-        self.prefs = helpers.load_preferences(
-            self.config["preferences_path"], self.config["preferences_default_path"])
+        self.prefs = self.load_preferences()
 
         logger.info('Looking for opened windows')
-        # workaround for this statement not working as expected:
-        # prefs = self.prefs.copy()
+        # prefs = self.prefs.copy() |--> this does not work as expected, workaround below:
         prefs = {}
         for el in self.prefs:
             prefs[el] = self.prefs[el].copy()
@@ -160,16 +272,22 @@ class SystemTrayApp(QSystemTrayIcon):
 
 
     def open_preferences(self):
-        logger.info('USER COMMAND: "Preferences"')
-
-        #TODO temporary implementation using notepad
-        commandline = f'notepad "{self.config["preferences_path"]}"'
-        logger.debug(f'running command: \'{commandline}\'')
-        process = subprocess.run(commandline)
-        if process.returncode != 0:
-            raise Exception(process)
-
-        logger.info('Finished processing command "Preferences"')
+        if self.prefs_dialog:
+            logger.debug('user re-issued command: "Preferences" while dialog is open')
+            self.prefs_dialog.show()
+            self.prefs_dialog.raise_()
+            self.prefs_dialog.activateWindow()
+        else:
+            logger.info('USER COMMAND: "Preferences"')
+            self.prefs_dialog = Preferences(self.prefs, self.favicon)
+            self.prefs_dialog.show()
+            self.prefs_dialog.exec_()
+            self.prefs = self.prefs_dialog.prefs
+            self.prefs_dialog = None
+            self.save_preferences()
+            self.set_hotkeys_listener()
+            self.set_context_menu()
+            logger.info('Finished processing command "Preferences"')
 
 
     def clear_database(self):
@@ -193,6 +311,22 @@ class SystemTrayApp(QSystemTrayIcon):
             logger.debug('operation cancelled')
 
         logger.info('Finished processing command "Clear Database"')
+
+
+    def open_about(self):
+        if self.about_dialog:
+            logger.debug('user re-issued command: "About" while dialog is open')
+            self.about_dialog.show()
+            self.about_dialog.raise_()
+            self.about_dialog.activateWindow()
+        else:
+            logger.info('USER COMMAND: "About"')
+            self.about_dialog = About(self.config, self.favicon)
+            self.about_dialog.show()
+            self.about_dialog.exec_()
+            self.about_dialog = None
+            logger.info('Finished processing command "About"')
+
 
 
 ##########  Functions  ############################
@@ -226,6 +360,7 @@ def run(main_config):
                              'Use system tray icon for info and options', trayapp.icon())
 
     application.exec_()
+    listener.stop()
     logger.info('Stopping application')
     sys.exit()
 

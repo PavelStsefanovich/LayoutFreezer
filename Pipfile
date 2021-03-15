@@ -4,7 +4,6 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-autopep8 = "*"
 pylint = "*"
 rope = "*"
 
@@ -13,6 +12,7 @@ pyinstaller = "*"
 pypiwin32 = "*"
 pyside2 = "*"
 pyyaml = "*"
+pynput = "*"
 
 [requires]
 python_version = "3.7"

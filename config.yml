@@ -1,10 +1,13 @@
 product_name: LayoutFreezer
-version: 0.3.0
+version: 0.4.1
+home_page: https://github.com/PavelStsefanovich/LayoutFreezer
 
 timestamp_format: "%Y-%m-%d__%H-%M-%S"
 logger_config: "{install_dir}/logger.json"
 logs_dir: "{install_dir}/logs"
-systray_icon: "{install_dir}/layoutfreezer.png"
+systray_icon: "{install_dir}/icons/layoutfreezer.png"
+freeze_icon: "{install_dir}/icons/freeze.png"
+restore_icon: "{install_dir}/icons/restore.png"
 database_path: "~/.layoutfreezer/database"
 preferences_path: "~/.layoutfreezer/prefs.yml"
 preferences_default_path: "{install_dir}/prefs.yml"
@@ -14,15 +17,19 @@ preferences_default_path: "{install_dir}/prefs.yml"
 # WARNING: do not use the same path for both 'preferences_path' and 'preferences_default_path'!
 # Preferences may be modified by user, so using the same path will result in loss of preferences defaults.
 
+#-----------------------------------------------------------------
 # Values accept environment variables references:
 # e.g. {env_APPDATA} will expand to APPDATA env. variable.
 # WARNING: env. variables are OS-specific
 
+#-----------------------------------------------------------------
 # Values accept references to the keys in the same file,
 # e.g. {logs_dir} will expand to the value of 'logs_dir' key
 
+#-----------------------------------------------------------------
 # Paths values accept user home directory shortcut: '~'
 
+#-----------------------------------------------------------------
 # RESERVED KEYS:
 #  'start_time'
 #  'install_dir'
@@ -30,7 +37,8 @@ preferences_default_path: "{install_dir}/prefs.yml"
 # and will be overwritten on the app launch.
 
 #-----------------------------------------------------------------
-
+#-----------------------------------------------------------------
+#-----------------------------------------------------------------
 # EXAMPLE (Windows-only):
 # timestamp_format: "%Y-%m-%d__%H-%M-%S"
 # logger_config: "{install_dir}/logger.json"

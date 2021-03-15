@@ -23,8 +23,8 @@ def init():
 
     try:
         main_config.update(
-            helpers.load_config_yml(
-                config_file_path=main_config_filepath,
+            helpers.load_yaml(
+                yaml_file_path=main_config_filepath,
                 log=False
             )
         )

@@ -1,4 +1,5 @@
 '''
+@PavelStsefanovich:
 This module is intended for integration with machine learning algorithms
 that can be used to learn users' apps positioning habits
 to predict most probable layout configurations

@@ -301,6 +301,9 @@ class SystemTrayApp(QSystemTrayIcon):
 
     def clear_database_curr_display_layout(self):
         logger.info('USER COMMAND: "Clear Current Display Layout"')
+        logger.info('Getting current screen layout')
+        display_layout = self.osscrn.enum_displays(self.app)
+        helpers.db_delete_current_display_layout(self.db, display_layout['hash'])
         logger.info('Finished processing command "Clear Current Display Layout"')
 
 

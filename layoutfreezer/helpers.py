@@ -145,8 +145,13 @@ def db_add_app_config(db, dl_hash, normalized_config):
 
 
 def db_delete_app_config(db, dl_hash, normalized_config):
-    logger.debug(f'deleting from database: {normalized_config}')
+    logger.debug(f'deleting window config from database: {normalized_config}')
     db.delete(dl_hash=dl_hash, name=normalized_config[0], title=normalized_config[1])
+
+
+def db_delete_current_display_layout(db, dl_hash):
+    logger.debug(f'deleting display layout from database: {dl_hash}')
+    db.delete(dl_hash=dl_hash)
 
 
 def normalize_app_config(app_config):

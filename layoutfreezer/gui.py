@@ -68,9 +68,11 @@ hotkeys_statusbar_map = {
 
 class About(QDialog):
 
-    def __init__(self, config):
+    def __init__(self, config, icon=None):
         super().__init__()
         self.config = config
+        if icon:
+            self.setWindowIcon(icon)
 
         # info panel
         about_html = self.generate_about_html(html_template)
@@ -123,10 +125,12 @@ class About(QDialog):
 
 class Preferences(QDialog):
 
-    def __init__(self, prefs):
+    def __init__(self, prefs, icon=None):
         super().__init__()
         self.prefs = prefs
         self.hotkey_format_regex = r'^\<ctrl\>\+\<alt\>(\+\<shift\>)?\+[a-zA-Z0-9]$'
+        if icon:
+            self.setWindowIcon(icon)
 
         # checkbox: restore minimized
         restore_minimized = QCheckBox()

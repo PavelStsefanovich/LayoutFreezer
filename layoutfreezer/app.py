@@ -61,9 +61,10 @@ class SystemTrayApp(QSystemTrayIcon):
 
         # Icons
         app_iconpath = path.abspath(self.config["systray_icon"])
+        self.favicon = QIcon(app_iconpath)
         if not path.isfile(app_iconpath):
             raise FileNotFoundError(f'App icon file not found: {app_iconpath}')
-        self.setIcon(QIcon(app_iconpath))
+        self.setIcon(self.favicon)
         self.freeze_iconpath = path.abspath(self.config["freeze_icon"])
         if not path.isfile(self.freeze_iconpath):
             raise FileNotFoundError(f'Menu icon file not found: {self.freeze_iconpath}')
@@ -278,7 +279,7 @@ class SystemTrayApp(QSystemTrayIcon):
             self.prefs_dialog.activateWindow()
         else:
             logger.info('USER COMMAND: "Preferences"')
-            self.prefs_dialog = Preferences(self.prefs)
+            self.prefs_dialog = Preferences(self.prefs, self.favicon)
             self.prefs_dialog.show()
             self.prefs_dialog.exec_()
             self.prefs = self.prefs_dialog.prefs
@@ -320,7 +321,7 @@ class SystemTrayApp(QSystemTrayIcon):
             self.about_dialog.activateWindow()
         else:
             logger.info('USER COMMAND: "About"')
-            self.about_dialog = About(self.config)
+            self.about_dialog = About(self.config, self.favicon)
             self.about_dialog.show()
             self.about_dialog.exec_()
             self.about_dialog = None

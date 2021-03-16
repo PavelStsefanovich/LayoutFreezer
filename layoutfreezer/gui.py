@@ -368,29 +368,42 @@ class Preferences(QDialog):
             self.hotkey_restore_status.setStyleSheet("color: red;")
 
 
-class Confirmation(QMessageBox):
+class Confirmation():
 
-    def __init__(self, icon=None):
-        super().__init__()
-        self.widget = QWidget()
-        if icon:
-            self.widget.setWindowIcon(icon)
+    def __init__(self, title="No title", icon=None):
+        self.title = title
+        self.icon = icon
+        self.msgBox = None
 
+    def is_open(self):
+        if self.msgBox:
+            return True
+        return False
 
-    def warning_proceed(self, title="No title", message="Are you sure?"):
+    def warning_before_proceeding(self, message="Are you sure?", info=None):
+        if self.msgBox:
+            self.msgBox.raise_()
+            self.msgBox.activateWindow()
+            return -1
+
         logger.debug('asking user for confirmation to proceed')
-        reply = self.warning(
-            self.widget,
-            title,
-            message,
-            self.Ok | self.Abort,
-            self.Abort
-        )
+        self.msgBox = QMessageBox()
+        self.msgBox.setIcon(QMessageBox.Warning)
+        self.msgBox.setWindowTitle(self.title)
+        self.msgBox.setText(message)
+        if info:
+            self.msgBox.setInformativeText(info)
+        if self.icon:
+            self.msgBox.setWindowIcon(self.icon)
+        self.msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Abort)
+        self.msgBox.setDefaultButton(QMessageBox.Abort)
+        reply = self.msgBox.exec_()
+        self.msgBox = None
 
-        if reply == self.Ok:
+        if reply == QMessageBox.Ok:
             logger.debug('user clicked "OK"')
             return True
-        elif reply == self.Abort:
+        elif reply == QMessageBox.Abort:
             logger.debug('user clicked "Abort"')
             return False
         else:

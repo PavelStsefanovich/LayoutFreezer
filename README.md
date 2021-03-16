@@ -19,7 +19,6 @@ A user can then reposition/resize windows for opened applications in one click t
 - Install/Uninstall scripts
 - Guess best location for an opened app that has config(s) saved for current display layout with non-matching title(s)
 - Guess best location for an opened app that has config saved for other display layout(s), but not for current one.
-- Rework "Clear Everything" confirmation dialog to avoid it's being open in background (issue: ui-001)
 - Cosmetic: in Preferences dialog make parameters names bold (groupbox title)
 ###### Tentative:
 - ? Preferences validation in case user edited it manually

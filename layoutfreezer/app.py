@@ -11,7 +11,6 @@ from PySide2.QtWidgets import (
     QAction,
     QApplication,
     QMenu,
-    QMessageBox,
     QSystemTrayIcon,
     QWidget)
 import subprocess
@@ -40,7 +39,6 @@ class SystemTrayApp(QSystemTrayIcon):
         self.app = app
         self.about_dialog = None
         self.prefs_dialog = None
-        self.confirmation = None
         self.freeze_all.connect(self.run_freeze_all)
         self.freeze_new.connect(self.run_freeze_new)
         self.restore.connect(self.run_restore)
@@ -70,6 +68,10 @@ class SystemTrayApp(QSystemTrayIcon):
 
         caution_iconpath = path.abspath(self.config["caution_icon"])
         self.caution_icon = QIcon(caution_iconpath)
+
+        # Confirmation dialog
+        self.confirmation = Confirmation(
+            title=self.config["product_name"], icon=self.favicon)
 
         # System tray tooltip
         self.setToolTip(
@@ -279,7 +281,6 @@ class SystemTrayApp(QSystemTrayIcon):
     def open_preferences(self):
         if self.prefs_dialog:
             logger.debug('user re-issued command: "Preferences" while dialog is open')
-            self.prefs_dialog.show()
             self.prefs_dialog.raise_()
             self.prefs_dialog.activateWindow()
         else:
@@ -304,31 +305,24 @@ class SystemTrayApp(QSystemTrayIcon):
 
 
     def clear_database_all(self):
-        if self.confirmation:
+        if self.confirmation.is_open():
             logger.debug('user re-issued command: "Clear Everything" while dialog is open')
-            #TODO issue: ui-001
+            user_reply = self.confirmation.warning_before_proceeding()
         else:
             logger.info('USER COMMAND: "Clear Everything"')
-            self.confirmation = Confirmation(self.favicon)
-            user_reply = self.confirmation.warning_proceed(
-                title=self.config["product_name"],
-                message="You are about to delete all saved layouts from the database."
-            )
-
+            user_reply = self.confirmation.warning_before_proceeding(
+                "You are about to delete all saved layouts from the database.")
             if user_reply:
                 logger.debug('dropping database')
                 self.db.clear()
             else:
                 logger.debug('operation cancelled')
-
-            self.confirmation = None
             logger.info('Finished processing command "Clear Everything"')
 
 
     def open_about(self):
         if self.about_dialog:
             logger.debug('user re-issued command: "About" while dialog is open')
-            self.about_dialog.show()
             self.about_dialog.raise_()
             self.about_dialog.activateWindow()
         else:

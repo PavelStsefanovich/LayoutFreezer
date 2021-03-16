@@ -321,6 +321,7 @@ class SystemTrayApp(QSystemTrayIcon):
             else:
                 logger.debug('operation cancelled')
 
+            self.confirmation = None
             logger.info('Finished processing command "Clear Everything"')
 
 

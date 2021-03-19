@@ -2,7 +2,7 @@
 
 LayoutFreezer is a system tray app that allows users to save coordinates for opened windows for each display configuration (that is number of displays, their sizes, orientation and location relative to each other). These coordinates can be used at a later time to restore desired window layout after any change, like moving/resizing opened applications or connecting/disconnecting external monitors.
 
-### Current Release: 0.4.1
+### Current Release: 0.4.2
 #### Release Notes:
 - Added support for hotkeys
 - Added icons and hotkey indicators to menu items

@@ -44,7 +44,6 @@ class SystemTrayApp(QSystemTrayIcon):
         self.restore.connect(self.run_restore)
 
         # Load preferences
-        logger.info('Loading preferences')
         self.prefs = self.load_preferences()
 
         # Initialize database connection
@@ -137,20 +136,28 @@ class SystemTrayApp(QSystemTrayIcon):
 
 
     def load_preferences(self):
-        preferences_path = path.abspath(
-            self.config["preferences_path"])
-        preferences_default_path = path.abspath(
-            self.config["preferences_default_path"])
-        logger.debug(f'preferences file path: {preferences_path}')
+        logger.info(f'Loading preferences')
+        use_default_prefs_reason = None
+        user_reply = -1
+        preferences_path = path.abspath(self.config["preferences_path"])
+        preferences_default_path = path.abspath(self.config["preferences_default_path"])
+        # logger.debug(f'preferences file path: {preferences_path}')
         makedirs(path.split(preferences_path)[0], exist_ok=True)
+
         try:
             prefs = helpers.load_yaml(preferences_path)
+            if prefs["version"] != self.config["version"]:
+                use_default_prefs_reason = f'Preferences file version \'{prefs["version"]}\' does not match current app version \'{self.config["version"]}\''
         except Exception as e:
+            use_default_prefs_reason = f'Failed to load preferences from file: "{preferences_path}"'
             logger.debug(e)
-            logger.debug(
-                f'copying default preferences from file "{preferences_default_path}"')
+
+        if use_default_prefs_reason:
+            logger.debug(use_default_prefs_reason)
+            logger.debug(f'using default preferences file: "{preferences_default_path}"')
             helpers.copyfile(preferences_default_path, preferences_path)
             prefs = helpers.load_yaml(preferences_path)
+
         return prefs
 
 
@@ -249,7 +256,8 @@ class SystemTrayApp(QSystemTrayIcon):
         # prefs = self.prefs.copy() |--> this does not work as expected, workaround below:
         prefs = {}
         for el in self.prefs:
-            prefs[el] = self.prefs[el].copy()
+            if isinstance(self.prefs[el], dict):
+                prefs[el] = self.prefs[el].copy()
         prefs["snap_to_grid"]["value"] = False
         prefs["fit_into_screen"]["value"] = False
         opened_windows = self.osscrn.enum_opened_windows(
@@ -306,7 +314,7 @@ class SystemTrayApp(QSystemTrayIcon):
 
     def clear_database_all(self):
         if self.confirmation.is_open():
-            logger.debug('user re-issued command: "Clear Everything" while dialog is open')
+            logger.debug('user re-issued command: "Clear Everything" while warning dialog is open')
             user_reply = self.confirmation.warning_before_proceeding()
         else:
             logger.info('USER COMMAND: "Clear Everything"')

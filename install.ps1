@@ -162,9 +162,11 @@ else {
     }
 }
 
+$product_version = (sls "$PSScriptRoot\config.yml" -Pattern '^version\:\s+(\d+\.\d+\.\d+)$').Matches.Groups[1].Value
+
 newline
-info "Installation directory:"
-info "'$PSScriptRoot'"
+info "Installing version     : $product_version"
+info "Installation directory : $PSScriptRoot"
 if (!(request_consent "Proceed?")) {
     warning "Installation cancelled by user."
     newline
@@ -183,7 +185,8 @@ catch {
     throw $_
 }
 
-$task_name = "LayoutFreezer_StartAtLogon_$env:USERNAME"
+$task_name = "LayoutFreezer_StartAtLogon_$product_version`_$env:USERNAME"
+$task_name_no_version = "LayoutFreezer_StartAtLogon_*_$env:USERNAME"
 $action = New-ScheduledTaskAction -Execute $executable_path
 $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 `
                                          -AllowStartIfOnBatteries `
@@ -200,10 +203,17 @@ $principal = New-ScheduledTaskPrincipal -UserId $current_user -RunLevel Highest 
 
 # check if scheduled task exists already
 $task = Get-ScheduledTask $task_name -ErrorAction SilentlyContinue
+if (!$task) {
+    $task = Get-ScheduledTask $task_name_no_version -ErrorAction SilentlyContinue
+    if ($task) {
+        $installed_version = ([regex]::Matches($task.TaskName, '^.*_(\d+\.\d+\.\d+)_.*$')).groups[1].value
+    }
+}
 
 if ($task) {
 
-    if ($task.Actions[0].Execute -eq $action.Execute) {
+    if ($task.TaskName -eq $task_name `
+            -and $task.Actions[0].Execute -eq $action.Execute) {
         info "Already installed, skipping..."
         $skip_install = $true
     }
@@ -211,7 +221,8 @@ if ($task) {
     if (!$skip_install) {
         newline
         warning "Found another installation of LayoutFreezer:"
-        info "  installation path : '$($task.Actions.Execute)'"
+        info "  version         : $installed_version"
+        info "  executable path : $($task.Actions.Execute)"
         info "You can cancel current installation process,"
         info "or remove the other installation and proceed."
         if (!(request_consent "Proceed?")) {

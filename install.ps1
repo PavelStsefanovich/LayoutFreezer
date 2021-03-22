@@ -230,7 +230,7 @@ if ($task) {
             newline
             exit
         }
-        Unregister-ScheduledTask -TaskName $task_name -Confirm:$false
+        Unregister-ScheduledTask -TaskName $task.TaskName -Confirm:$false
     }
 }
 

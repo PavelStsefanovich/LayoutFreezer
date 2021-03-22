@@ -31,7 +31,7 @@ try {
         }
     }
     mkdir .\dist\LayoutFreezer | Out-Null
-    foreach ($item in @('dist\LayoutFreezer.exe', 'config.yml', 'prefs.yml', 'icons', 'logger.json', 'README.md')) {
+    foreach ($item in @('dist\LayoutFreezer.exe', 'config.yml', 'prefs.yml', 'icons', 'logger.json', 'README.md', 'install.ps1')) {
         (gi $item).FullName | % { cp $_ .\dist\LayoutFreezer -Force -Recurse}
     }
     Add-Type -AssemblyName "system.io.compression.filesystem"

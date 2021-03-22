@@ -61,18 +61,17 @@ function request_consent {
     )
 
     do {
-        warning ($message_padding + "(?) $question ( Y: yes / N: no / E: exit ): ") -no_prefix
+        warning ($message_padding + "(?) $question ( Y: yes / N: no): ") -no_prefix
         $reply = [string]$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown").Character
-        if ($reply.tolower() -notin 'y', 'n', 'e') {
+        if ($reply.tolower() -notin 'y', 'n') {
             error "It's a yes/no question."
         }
     }
-    while ($reply.tolower() -notin 'y', 'n', 'e')
+    while ($reply.tolower() -notin 'y', 'n')
 
     switch ($reply) {
         'y' { info "<yes>"; return $true }
         'n' { info "<no>"; return $false }
-        'e' { info "<exit>`n"; exit }
     }
 }
 
@@ -144,19 +143,22 @@ $ErrorActionPreference = 'Stop'
 newline
 if (isadmin) {
     confirm "running as administrator."
-    $run_level = "Highest"
 }
 else {
     warning "This console window is running without elevated permissions!"
-    info    "Plese note that LayoutFreezer will not be able to manipulate"
-    info    "windows of apps that are running as administrator."
+    info    "Administrator privileges are required to proceed. Reasons:"
+    info    "  - LayoutFreezer must run as admin in order to be able to manipulate"
+    info    "     windows of the apps that are running as administrator."
+    info    "  - Install script must run as admin to register scheduled task"
+    info    "     that launches LayoutFreezer with highest privileges."
     if (request_consent "Do you want to relaunch installation script as administrator?") {
         info "opening new console window as administrator"
         restart_elevated
     }
     else {
-        info "continuing installation without elevated permissions"
-        $run_level = "Limited"
+        warning "Installation cancelled by user."
+        newline
+        exit
     }
 }
 
@@ -194,7 +196,7 @@ $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 `
 
 $current_user = $env:USERDOMAIN, $env:USERNAME -join ('\')
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User $current_user
-$principal = New-ScheduledTaskPrincipal -UserId $current_user -RunLevel $run_level -LogonType Interactive
+$principal = New-ScheduledTaskPrincipal -UserId $current_user -RunLevel Highest -LogonType Interactive
 
 # check if scheduled task exists already
 $task = Get-ScheduledTask $task_name -ErrorAction SilentlyContinue
@@ -202,16 +204,14 @@ $task = Get-ScheduledTask $task_name -ErrorAction SilentlyContinue
 if ($task) {
 
     if ($task.Actions[0].Execute -eq $action.Execute) {
-        if ($task.Principal.RunLevel -eq $principal.RunLevel) {
-            info "Already installed, skipping..."
-            $skip_install = $true
-        }
+        info "Already installed, skipping..."
+        $skip_install = $true
     }
 
     if (!$skip_install) {
         newline
-        warning "Found another installation of LayoutFreezer"
-        info "Installation path: '$($task.Actions.Execute)'"
+        warning "Found another installation of LayoutFreezer:"
+        info "  installation path : '$($task.Actions.Execute)'"
         info "You can cancel current installation process,"
         info "or remove the other installation and proceed."
         if (!(request_consent "Proceed?")) {

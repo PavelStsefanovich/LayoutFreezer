@@ -6,11 +6,10 @@ LayoutFreezer is a system tray app that allows users to save coordinates for ope
 #### Release Notes:
 - Added support for hotkeys
 - Added icons and hotkey indicators to menu items
-- Implemented Preferences dialog
-- Implemented About dialog
+- Implemented GUI dialogs: About, Preferences, Warning
 - Split Clear Database into two options: Current Layout and Everything
-- Existing dialogs are now brought upfront if user re-issues corresponding command without closing it first.
-
+- Implemented old logs disposal (max number of log files is set in config.yml)
+- Added Install/Uninstall scripts (Windows)
 
 ## How To:
 After starting LF for the first time, a user will need to position opened windows into desired layout and run 'Freeze Layout' command, which will save current display configuration and any opened windows configurations into the database. Users can add new apps window configurations into the database later by running 'Freeze Layout' again. Users can also save apps layouts for each display configurations they work with (for example, you can have one external monitor at home and three-monitor docking station at work; or work in rotation with monitors in landscape and portrait orientation).
@@ -18,10 +17,6 @@ After starting LF for the first time, a user will need to position opened window
 A user can then reposition/resize windows for opened applications in one click to match saved coordinates for each opened app for current display configuration. Matching applications are determined by process name and title. If title does not match exactly, the config with most similar title will be selected. If no similar titles are found, LF will attempt to guess the most suitable position configuration considering all saved configs for current app. Nothing will happen for opened windows that don't have at least a single configuration saved into the database.
 
 ## Roadmap:
-- > Add version to prefs; upgrade prefs file if necessary
-- > Install/Uninstall scripts
-- > Set prefs.yml version dependend on config.yml version
-- > Logs disposal.
 - Guess best location for an opened app that has config(s) saved for current display layout with non-matching title(s)
 - Guess best location for an opened app that has config saved for other display layout(s), but not for current one.
 - Auto-Upgrade pref file on version change; warn user if preferences are reset to defaults

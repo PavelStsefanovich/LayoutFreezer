@@ -53,6 +53,11 @@ def init():
         helpers.errpopup(errormessage=errormessage, level='critical')
         sys.exit()
 
+    # clean up old logs
+    logger.debug('removing old logs')
+    helpers.cleanup_logs_dir(
+        logs_dir=main_config["logs_dir"], max_num_of_logs=main_config["max_num_of_logs"])
+
 
 def run():
     global main_config

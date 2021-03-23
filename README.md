@@ -21,9 +21,9 @@ A user can then reposition/resize windows for opened applications in one click t
 - > Add version to prefs; upgrade prefs file if necessary
 - > Install/Uninstall scripts
 - > Set prefs.yml version dependend on config.yml version
+- > Logs disposal.
 - Guess best location for an opened app that has config(s) saved for current display layout with non-matching title(s)
 - Guess best location for an opened app that has config saved for other display layout(s), but not for current one.
-- Logs disposal.
 - Auto-Upgrade pref file on version change; warn user if preferences are reset to defaults
 ###### Tentative:
 - ? Preferences validation in case user edited it manually

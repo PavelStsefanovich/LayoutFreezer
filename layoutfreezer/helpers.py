@@ -3,7 +3,7 @@ from layoutfreezer import gui
 import json
 import logging
 import logging.config
-from os import path, makedirs, environ
+from os import environ, listdir, makedirs, path, remove
 import platform
 import re
 from shutil import copyfile
@@ -52,6 +52,17 @@ def setup_logger(
 
     # apply logger config
     logging.config.dictConfig(logger_config)
+
+
+def cleanup_logs_dir(logs_dir='logs', max_num_of_logs=15):
+    if path.isdir(logs_dir):
+        list_of_logfiles = listdir(logs_dir)
+        list_of_logfiles = [f'{logs_dir}/{x}' for x in list_of_logfiles]
+
+        while len(list_of_logfiles) > max_num_of_logs:
+            oldest_file = min(list_of_logfiles, key=path.getctime)
+            remove(oldest_file)
+            list_of_logfiles.remove(oldest_file)
 
 
 def load_yaml(yaml_file_path, log=True):

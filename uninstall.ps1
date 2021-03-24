@@ -184,5 +184,6 @@ if ($installed_tasks) {
 else {
     newline
     info "No installations found for current user, exiting."
-    newline
 }
+
+newline

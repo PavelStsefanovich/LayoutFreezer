@@ -25,7 +25,7 @@ function newline {
         [int]$count = 1
     )
 
-    Write-Host ("`n"*$count)
+    Write-Host ("$message_padding`n" * $count).TrimEnd()
 }
 
 function warning {
@@ -61,7 +61,7 @@ function request_consent {
     )
 
     do {
-        warning ($message_padding + "(?) $question ( Y: yes / N: no): ") -no_prefix
+        warning (" (?) $question ( Y: yes / N: no): ") -no_prefix
         $reply = [string]$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown").Character
         if ($reply.tolower() -notin 'y', 'n') {
             error "It's a yes/no question."
@@ -81,7 +81,7 @@ function isadmin {
 }
 
 function restart_elevated {
-     
+
     param(
         $script_args,
         [switch]$kill_original,
@@ -104,7 +104,7 @@ function restart_elevated {
 
         if ($script_args) {
             $script_args.GetEnumerator() | % {
-                
+
                 if ($_.Value -is [boolean]) {
                     $argline += " -$($_.key) `$$($_.value)"
                 }

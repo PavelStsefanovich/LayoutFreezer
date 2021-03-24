@@ -237,6 +237,12 @@ if ($task) {
 if (!$skip_install) {
     $task = New-ScheduledTask -Action $action -Trigger $trigger -Principal $principal -Settings $settings
     Register-ScheduledTask $task_name -InputObject $task | Out-Null
+    
+    # create application shortcut
+    $objShell = New-Object -ComObject ("WScript.Shell")
+    $objShortCut = $objShell.CreateShortcut((Join-Path $env:USERPROFILE "Start Menu\Programs\LayoutFreezer.lnk"))
+    $objShortCut.TargetPath = $task.Actions.Execute
+    $objShortCut.Save()
 }
 
 newline

@@ -178,6 +178,9 @@ if ($installed_tasks) {
         Unregister-ScheduledTask -TaskName $task.TaskName -Confirm:$false
     }
 
+    # remove application shortcut
+    rm (Join-Path $env:USERPROFILE "Start Menu\Programs\LayoutFreezer.lnk") -Force
+
     newline
     confirm "Uninstall complete"
 }

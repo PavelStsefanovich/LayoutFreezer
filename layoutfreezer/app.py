@@ -1,4 +1,4 @@
-from layoutfreezer.ai import adjust_window_rectangle
+from layoutfreezer.ai import adjust_window_rectangle, get_config_matches
 from layoutfreezer.gui import About, Preferences, Confirmation
 from layoutfreezer import helpers
 from layoutfreezer.db import Database
@@ -229,7 +229,7 @@ class SystemTrayApp(QSystemTrayIcon):
             normalized_config = helpers.normalize_app_config(opened_windows[window])
             window_reference = f'{normalized_config[0]} [{normalized_config[1]}]'
             if saved_app_configs:
-                matches = helpers.get_config_matches(normalized_config, saved_app_configs)
+                matches = get_config_matches(normalized_config, saved_app_configs)
                 if matches and not isinstance(matches, dict):
                     if not all:
                         logger.debug(f'skipped: "{window_reference}" (reason: already in database)')

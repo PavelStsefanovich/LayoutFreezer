@@ -142,6 +142,25 @@ def db_enum_apps_for_curr_screen_layout(db, dl_hash, normalize=True):
     return results
 
 
+def db_enum_curr_app_configs(db, process_name, normalize=True):
+    logger.debug(f'looking in database for all saved app position configurations for process "{process_name}"')
+    curr_app_all_configs = db.search(name=process_name, order_by='display_index')
+
+    if normalize:
+        results = []
+        for item in curr_app_all_configs:
+            results.append(item[2:])
+    else:
+        results = curr_app_all_configs
+
+    if results:
+        logger.debug(f'found saved app position configurations: {results}')
+    else:
+        logger.debug(f'no saved app position configurations found for process "{process_name}"')
+
+    return results
+
+
 def db_add_app_config(db, dl_hash, normalized_config):
     logger.debug(f'adding to database: {normalized_config}')
     db.add(
@@ -175,24 +194,6 @@ def normalize_app_config(app_config):
         int(app_config['display_primary'])
     )
     return result
-
-
-def get_config_matches(normalized_config, saved_app_configs):
-    logger.debug(f'looking for saved config matches for: "{normalized_config}"')
-    partial_matches = []
-    for app_config in saved_app_configs:
-        if app_config[0:2] == normalized_config[0:2]:
-            logger.debug(f'found full match: {app_config}')
-            return app_config
-        elif app_config[0] == normalized_config[0]:
-            logger.debug(f'found partial match: {app_config}')
-            partial_matches.append(app_config)
-
-    if partial_matches:
-        return {'partial_matches' : partial_matches}
-
-    logger.debug('no matches found')
-    return None
 
 
 ##########  Main  #################################

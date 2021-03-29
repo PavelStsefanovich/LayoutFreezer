@@ -221,15 +221,15 @@ class SystemTrayApp(QSystemTrayIcon):
             display_layout['screens'], self.prefs)
 
         logger.info('Searching database for saved app position configurations for current screen layout')
-        saved_app_configs = helpers.db_enum_apps_for_curr_screen_layout(
+        curr_display_app_configs = helpers.db_enum_apps_for_curr_screen_layout(
             self.db, display_layout['hash'])
 
         logger.info('Saving position configurations for opened apps into the database')
         for window in opened_windows:
             normalized_config = helpers.normalize_app_config(opened_windows[window])
             window_reference = f'{normalized_config[0]} [{normalized_config[1]}]'
-            if saved_app_configs:
-                matches = get_config_matches(normalized_config, saved_app_configs)
+            if curr_display_app_configs:
+                matches = get_config_matches(normalized_config, curr_display_app_configs)
                 if matches and not isinstance(matches, dict):
                     if not all:
                         logger.debug(f'skipped: "{window_reference}" (reason: already in database)')
@@ -264,7 +264,7 @@ class SystemTrayApp(QSystemTrayIcon):
             display_layout['screens'], prefs)
 
         logger.info('Searching database for saved app position configurations for current screen layout')
-        saved_app_configs = helpers.db_enum_apps_for_curr_screen_layout(
+        curr_display_app_configs = helpers.db_enum_apps_for_curr_screen_layout(
             self.db, display_layout['hash'])
 
         logger.info('Restoring position configurations for opened apps')
@@ -272,10 +272,14 @@ class SystemTrayApp(QSystemTrayIcon):
             normalized_config = helpers.normalize_app_config(opened_windows[window])
             window_reference = f'{normalized_config[0]} [{normalized_config[1]}]'
 
+            logger.info('Searching database for saved configurations for current app across all screen layouts')
+            curr_app_all_saved_configs = helpers.db_enum_curr_app_configs(self.db, normalized_config[0])
+
             logger.debug(f'adjusting position config for: {window_reference}')
             adjusted_window_rectangle = adjust_window_rectangle(
                 normalized_config,
-                saved_app_configs,
+                curr_display_app_configs,
+                curr_app_all_saved_configs,
                 display_layout,
                 self.osscrn,
                 self.prefs)

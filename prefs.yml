@@ -1,8 +1,8 @@
 version: 0.4.3
 
-restore_minimized:
+include_minimized:
   value: False
-  description: When freezing layout, bring up and include minimized windows.
+  description: When freezing or restoring layout, bring up and include minimized windows.
 
 snap_to_grid:
   value: True

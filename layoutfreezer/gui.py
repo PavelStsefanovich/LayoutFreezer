@@ -133,21 +133,21 @@ class Preferences(QDialog):
         if icon:
             self.setWindowIcon(icon)
 
-        # checkbox: restore minimized
-        restore_minimized = QCheckBox()
-        restore_minimized.setFixedWidth(35)
-        restore_minimized.setChecked(self.prefs["restore_minimized"]["value"])
-        restore_minimized.stateChanged.connect(
-            lambda: self.restore_minimized(restore_minimized.isChecked()))
-        restore_minimized_descr = QLabel(self.prefs["restore_minimized"]["description"])
-        restore_minimized_descr.setWordWrap(True)
+        # checkbox: Include Minimized
+        include_minimized = QCheckBox()
+        include_minimized.setFixedWidth(35)
+        include_minimized.setChecked(self.prefs["include_minimized"]["value"])
+        include_minimized.stateChanged.connect(
+            lambda: self.include_minimized(include_minimized.isChecked()))
+        include_minimized_descr = QLabel(self.prefs["include_minimized"]["description"])
+        include_minimized_descr.setWordWrap(True)
 
-        restore_minimized_layout = QHBoxLayout()
-        restore_minimized_layout.addWidget(restore_minimized)
-        restore_minimized_layout.addWidget(restore_minimized_descr)
+        include_minimized_layout = QHBoxLayout()
+        include_minimized_layout.addWidget(include_minimized)
+        include_minimized_layout.addWidget(include_minimized_descr)
 
-        restore_minimized_groupbox = QGroupBox("Restore Minimized")
-        restore_minimized_groupbox.setLayout(restore_minimized_layout)
+        include_minimized_groupbox = QGroupBox("Include Minimized")
+        include_minimized_groupbox.setLayout(include_minimized_layout)
 
         # checkbox: snap to grid
         snap_to_grid = QCheckBox()
@@ -292,7 +292,7 @@ class Preferences(QDialog):
 
         # Create main layout and add widgets
         main_layout = QVBoxLayout()
-        main_layout.addWidget(restore_minimized_groupbox)
+        main_layout.addWidget(include_minimized_groupbox)
         main_layout.addWidget(snap_to_grid_groupbox)
         main_layout.addWidget(fit_into_screen_groupbox)
         main_layout.addWidget(match_cutoff_groupbox)
@@ -303,9 +303,9 @@ class Preferences(QDialog):
         self.setLayout(main_layout)
 
 
-    def restore_minimized(self, isChecked):
-        print(f'restore_minimized: {isChecked}')
-        self.prefs["restore_minimized"]["value"] = isChecked
+    def include_minimized(self, isChecked):
+        print(f'include_minimized: {isChecked}')
+        self.prefs["include_minimized"]["value"] = isChecked
 
 
     def snap_to_grid(self, isChecked):

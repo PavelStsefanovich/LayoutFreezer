@@ -119,7 +119,7 @@ def callback(hwnd, callback_param):
             if style & wcon.WS_VISIBLE:
                 include = True
                 if wgui.IsIconic(hwnd):
-                    if callback_param["prefs"]["restore_minimized"]["value"]:
+                    if callback_param["prefs"]["include_minimized"]["value"]:
                         wgui.ShowWindow(hwnd, 9)
                     else:
                         include = False

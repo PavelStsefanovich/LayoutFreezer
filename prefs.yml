@@ -1,4 +1,4 @@
-version: 0.4.3
+version: 0.4.4
 
 include_minimized:
   value: False
@@ -35,3 +35,14 @@ hotkeys:
      - Ctrl + Alt + letter/digit
      - Ctrl + Alt + Shift + letter/digit
     Supported format: <ctrl>+<alt>[+<shift>]+x
+
+# not implemented in the Preferences dialog
+guess_params_priority_order:
+  value:
+    - display_orientation
+    - display_index
+    - display_primary
+  description: |
+    When restoring layout, if saved configs are found for a process, but not in current display layout,
+    LayoutFreezer will attempt to guess the most appropriate window position based on number of properties in saved configs.
+    This parameter determines priority of each property (the first in the list is the highest priority)

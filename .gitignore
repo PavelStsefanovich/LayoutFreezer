@@ -9,6 +9,7 @@ downloads/
 *.dll
 *.zip
 notes.*txt
+test*
 
 #(ps)(!) TEMPORARY
 prefs_.yml

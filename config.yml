@@ -1,5 +1,5 @@
 product_name: LayoutFreezer
-version: 0.4.3
+version: 0.4.4
 home_page: https://github.com/PavelStsefanovich/LayoutFreezer
 
 timestamp_format: "%Y-%m-%d__%H-%M-%S"
@@ -45,7 +45,11 @@ preferences_default_path: "{install_dir}/prefs.yml"
 # timestamp_format: "%Y-%m-%d__%H-%M-%S"
 # logger_config: "{install_dir}/logger.json"
 # logs_dir: "{env_ALLUSERSPROFILE}/LayoutFreezer/logs"
+# max_num_of_logs: 10
 # systray_icon: "{install_dir}/layoutfreezer.png"
+# freeze_icon: "{install_dir}/icons/freeze.png"
+# restore_icon: "{install_dir}/icons/restore.png"
+# caution_icon: "{install_dir}/icons/caution.png"
 # database_path: "{env_APPDATA}/LayoutFreezer/database"
-# preferences_path: "{env_APPDATA}/LayoutFreezer/prefs.yml"
+# preferences_path: "~/.layoutfreezer/prefs.yml"
 # preferences_default_path: "{install_dir}/prefs.yml"

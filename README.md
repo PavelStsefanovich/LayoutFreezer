@@ -1,4 +1,5 @@
 # LayoutFreezer
+![](icons/layoutfreezer.png)
 
 Have you ever find find yourself moving and resizing open windows on your desktop each time when you reconnect your laptop to your docking station or external displays after another meaningful meeting in the office, because they are just piled up on top of each other in the middle of the screen? Have you ever wished that OS could remember the way you positioned those windows when changing display configuration? If so, this app may be of help to you.
 

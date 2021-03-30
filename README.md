@@ -20,12 +20,16 @@ LayoutFreezer is a system tray app that allows users to save coordinates for ope
 LayoutFreezer currently supports only Winows.
 1. Download and unzip. Destination directory will become installation directory.
 2. Run **install.ps1** or **uninstall.ps1** in the package root to install/uninstall.
+
 `Installation simply creates scheduled task to run LayoutFreezer at logon.`
+
 `Installs for current user only.`
 
 ## How To:
 After starting LF for the first time, move/resize opened windows into desired layout and run **Freeze** command either from systray app menu or by using hotkeys. Doing so will save current display layout and opened windows configurations into the database.
+
 `(!) To include minimized windows, enable corresponding checkbox in Preferences`
+
 ![](docs/systray.menu.02.png)
 
 ###### Multiple display layouts
@@ -33,16 +37,21 @@ You can save apps configurations for each display layout that you work with (for
 
 ###### Add new application to saved layout
 Run **Freeze New** command to only add those opened windows configurations that are not already in the database. Windows with *process name* and *title* that match exactly any configuration found in the database are skipped. This allows multiple windows of the same app to be saved individually.
+
 `(!) To include minimized windows, enable corresponding checkbox in Preferences`
 
 ###### Force save all opened windows
 Run **Freeze All** command to force save configurations of all currently opened windows. If a window config with matching *process name* and *title* is found in database, it will be replaced.
+
 `(!) To include minimized windows, enable corresponding checkbox in Preferences`
+
 ![](docs/systray.menu.03.png)
 
 ###### Restore layout
 Run **Restore Layout** any time to restore saved windows size/position configurations of the opened apps for the current display layout.
+
 `(!) To include minimized windows, enable corresponding checkbox in Preferences`
+
 ![](docs/systray.menu.04.png)
 
 > Under the hood:
@@ -60,6 +69,7 @@ Run **Restore Layout** any time to restore saved windows size/position configura
 If you noticed that restore operation became less reliable because there are too many different configurations for each app in the database and they are not always picked correctly, you can clean app configurations and start afresh. You have two options here:
 - remove only app configurations for current display layout, but leave all the rest; or
 - wipe database clean and start over
+
 ![](docs/systray.menu.05.png)
 
 ## Roadmap:

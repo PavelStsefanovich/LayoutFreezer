@@ -377,7 +377,8 @@ def run(main_config):
                              'Use system tray icon for info and options', trayapp.icon())
 
     application.exec_()
-    listener.stop()
+    if listener:
+        listener.stop()
     logger.info('Stopping application')
     sys.exit()
 
